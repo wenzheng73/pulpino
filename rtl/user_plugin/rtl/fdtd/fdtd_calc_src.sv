@@ -1,43 +1,47 @@
 module load_field_source
-#(parameter data_width = 64, parameter cut_width  = 128 )
+#(parameter FDTD_DATA_WIDTH = 32,
+  parameter CUT_LT  = 51,
+  parameter CUT_RT  = 21
+  )
 (
-	input 									clock,
-	input									clken,
+	input 			          	CLK,
+	input			        	RST_N,
+	input 					clken,
 	/////////////
-	input		signed	[data_width-1:0]	Ez_s_in,
-	input		signed	[data_width-1:0]	Jz,
+	input	signed	[FDTD_DATA_WIDTH-1:0]	Ez_c_i,
 	/////////////
-	//input		signed	[data_width-1:0]	Cezj,
+	input	signed	[FDTD_DATA_WIDTH-1:0]	cezhy,
+	input	signed	[FDTD_DATA_WIDTH-1:0]	ceze,
 	/////////////
-	output		signed  [data_width-1:0]	Ez_s_out
+	output	signed  [FDTD_DATA_WIDTH-1:0]	Ez_n_o
+	);
+///////
+localparam CUT_WIDTH = 2*FDTD_DATA_WIDTH;
+//
+reg     [FDTD_DATA_WIDTH-1:0]	temp_r0;
+wire	[CUT_WIDTH-1:0]		cut_data0;
+//
+always @(posedge CLK or negedge RST_N)begin
+	if (!RST_N)
+		temp_r0 <= 'd0;
+	else 
+		temp_r0 <= Ez_c_i;
+end
+///////
+mult_gen_1		multi_Jz_inst0 (
+				.CLK	( clock ),////
+				.CE	( clken),
+				.A 	( cezj ),///
+				.B 	( Jz ),///material coefficient
+				.P	( cut_data0 )////cut				);
+///////
+c_addsub_0		add_Ez_inst0	(
+				.ADD (1'b1),
+				.CE  (clken),
+				.CLK (clock),    
+				.A   ({cut_data0[CUT_WIDTH-1],cut_data0[CUT_LT:CUT_RT]}),  
+				.B   (temp_r0),   
+				.S   (Ez_s_out)     	
 				);
-///////
-localparam		Cezj = 32'b11111111111110011111100011101010;
-///////
-wire	[cut_width-1:0]		cut_data0;
-///////
-/*mult_gen_1					multi_Jz_inst0 (
-								.CLK	( clock ),////
-								.CE	    ( clken),
-								.A 		( Cezj ),///
-								.B 		( Jz ),///material coefficient
-								.P		( cut_data0 )////cut处理
-								);*/
-mult_gen_1					multi_Jz_inst0 (
-								//.CLK	( clock ),////
-								//.CE	    ( clken),
-								.A 		( Cezj ),///
-								.B 		( Jz ),///material coefficient
-								.P		( cut_data0 )////cut处理
-								);
-///////
-c_addsub_1 					add_Ez_inst0	(
-								//.ADD (1'b1),
-								.CE	 (clken),
-								.CLK (clock),    
-								.A 	 ({cut_data0[cut_width-1],cut_data0[51:21]}),  
-								.B	 (Ez_s_in),   
-								.S	 (Ez_s_out)     	
-								);
 ///////
 endmodule

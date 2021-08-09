@@ -38,7 +38,9 @@ logic [FDTD_DATA_WIDTH-1:0]	Ez_n_1;
 //------updating magnetic data process---------//
 fdtd_calc_Hy 
 	#(
-	  .FDTD_DATA_WIDTH ( FDTD_DATA_WIDTH )
+	  .FDTD_DATA_WIDTH ( FDTD_DATA_WIDTH ),
+	  .CUT_LT	   ( CUT_LT ),
+	  .CUT_RT	   ( CUT_RT )
 	)
 	calc_Hy_i(
 	  .CLK           ( CLK          ),
@@ -58,7 +60,9 @@ fdtd_calc_Hy
 //------updating electric data process--------//
 fdtd_calc_Ez 
 	#(
-	  .FDTD_DATA_WIDTH ( FDTD_DATA_WIDTH )
+	  .FDTD_DATA_WIDTH ( FDTD_DATA_WIDTH ),
+  	  .CUT_LT	   ( CUT_LT ),
+	  .CUT_RT	   ( CUT_RT )
 	)
 	calc_Ez_i(
 	  .CLK           ( CLK          ),
@@ -78,7 +82,9 @@ fdtd_calc_Ez
 //------loading field source---------------//
 fdtd_calc_src
 	#(
-	  .FDTD_DATA_WIDTH ( FDTD_DATA_WIDTH )
+	  .FDTD_DATA_WIDTH ( FDTD_DATA_WIDTH ),
+  	  .CUT_LT	   ( CUT_LT ),
+	  .CUT_RT	   ( CUT_RT )
 	)
 	calc_src_i(
 	  .CLK           ( CLK          ),
@@ -87,6 +93,8 @@ fdtd_calc_src
 	  .clken         ( calc_src_en_i),
           //coefficients
 	  .cezj		 ( cezj         ),
+	  //current timestep's data
+	  .Ez_c_i        ( Ez_old_i     ),
           //new data
 	  .Ez_n_o        ( Ez_n_1     )
 	

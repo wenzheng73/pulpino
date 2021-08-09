@@ -25,8 +25,6 @@ wire 	signed 	[FDTD_DATA_WIDTH-1:0]		temp0;
 /////////////////////////////////////////////////////////
 wire	signed	[CUT_WIDTH-1:0]			cut_data0;
 wire	signed	[CUT_WIDTH-1:0]			cut_data1;
-wire	signed	[CUT_WIDTH-1:0]			cut_data2;
-//wire	signed	[CUT_WIDTH-1:0]			cut_data3;
 /////////////////////////////////////////////////////////
 wire 	signed 	[FDTD_DATA_WIDTH-1:0]		old_data;
 /////////////////////////////////////////////////////////
