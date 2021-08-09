@@ -19,9 +19,10 @@ module user_plugin
 
     logic apb_up_int_o;
     logic axi_up_int_o;
+    logic fdtd_up_int_o;
 
-    assign int_o = apb_up_int_o | axi_up_int_o;
-
+    assign int_o = apb_up_int_o | axi_up_int_o|fdtd_up_int_o;
+    
     apb_up 
     #(
         .APB_ADDR_WIDTH(12)
@@ -55,14 +56,14 @@ module user_plugin
         .mstr    ( axi_mstr     ),
         .int_o   ( axi_up_int_o )
     );*/
-
+    
     fdtd_top fdtd_top_i
     (
         .ACLK    ( clk_i        ),
         .ARESETn ( rst_n        ),
         .slv     ( axi_slv      ),
         .mstr    ( axi_mstr     ),
-        .int_o   ( axi_up_int_o )
-    );
-
+        .int_o   ( fdtd_up_int_o )
+        
+      );
 endmodule
