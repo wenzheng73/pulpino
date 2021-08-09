@@ -35,6 +35,7 @@ always @(posedge CLK or negedge RST_N)begin
 	if (!RST_N)begin
 	    Hy_temp0  <= 'd0;
 	    Hy_temp1  <= 'd0;
+	end
 	else begin
 	    Hy_temp0  <= Hy_old_i;
 	    Hy_temp1  <= Hy_temp0;
@@ -51,7 +52,7 @@ c_addsub_0 	sub_Ez_inst0	(
 			);
 /////////////////////////////////////////////////////
 mult_gen_0	multi_Ez_inst0 (
-			.CLK	( clock ),////
+			.CLK	( CLK ),////
 			.CE	( clken ),
 			.A	( temp0 ),///
 			.B      ( cezhy ),///material coefficient
@@ -59,17 +60,19 @@ mult_gen_0	multi_Ez_inst0 (
 			);														
 /////////								
 mult_gen_0	multi_Ez_inst2 (
-			.CLK    ( clock ),////
+			.CLK    ( CLK ),////
 			.CE	( clken ),
-			.A 	( Ez_0  ),///
-			.B 	( Ceze  ),///material coefficient
+			.A 	( Ez_old_i  ),///
+			.B 	( ceze  ),///material coefficient
 			.P	( cut_data1 )////cut
 			);
 fdtd_data_delay
-	#(FDTD_DATA_WIDTH = FDTD_DATA_WIDTH
-	  DELAY_STAGE     = 2
+	#(.FDTD_DATA_WIDTH ( FDTD_DATA_WIDTH ),
+	  .DELAY_STAGE     (2)
 	)
 	u1(
+		.CLK   (CLK),
+		.RST_N (RST_N),
 		.data_i({cut_data0[CUT_WIDTH-1],cut_data0[CUT_LT:CUT_RT]}),
 		.data_o(old_data)
 	);
@@ -77,7 +80,7 @@ fdtd_data_delay
 c_addsub_0 	add_Ez_inst3	(
 			.ADD(1'b1 ),    // 
 			.CE	(clken),     // 
-			.CLK    (clock),  // 
+			.CLK    (CLK),  // 
 			.A 	({cut_data0[CUT_WIDTH-1],cut_data0[CUT_LT:CUT_RT]}), 
 			.B	(old_data),    // 
 			.S	(Ez_n_o)      //	

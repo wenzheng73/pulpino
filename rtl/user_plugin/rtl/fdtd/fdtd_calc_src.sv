@@ -1,4 +1,4 @@
-module load_field_source
+module fdtd_calc_src 
 #(parameter FDTD_DATA_WIDTH = 32,
   parameter CUT_LT  = 51,
   parameter CUT_RT  = 21
@@ -9,9 +9,9 @@ module load_field_source
 	input 					clken,
 	/////////////
 	input	signed	[FDTD_DATA_WIDTH-1:0]	Ez_c_i,
+	input	signed	[FDTD_DATA_WIDTH-1:0]	Jz,
 	/////////////
-	input	signed	[FDTD_DATA_WIDTH-1:0]	cezhy,
-	input	signed	[FDTD_DATA_WIDTH-1:0]	ceze,
+	input	signed	[FDTD_DATA_WIDTH-1:0]	cezj,
 	/////////////
 	output	signed  [FDTD_DATA_WIDTH-1:0]	Ez_n_o
 	);
@@ -28,20 +28,21 @@ always @(posedge CLK or negedge RST_N)begin
 		temp_r0 <= Ez_c_i;
 end
 ///////
-mult_gen_1		multi_Jz_inst0 (
-				.CLK	( clock ),////
+mult_gen_0		multi_Jz_inst0 (
+				.CLK	( CLK ),////
 				.CE	( clken),
 				.A 	( cezj ),///
 				.B 	( Jz ),///material coefficient
-				.P	( cut_data0 )////cut				);
+				.P	( cut_data0 )
+				);
 ///////
 c_addsub_0		add_Ez_inst0	(
 				.ADD (1'b1),
 				.CE  (clken),
-				.CLK (clock),    
+				.CLK (CLK),    
 				.A   ({cut_data0[CUT_WIDTH-1],cut_data0[CUT_LT:CUT_RT]}),  
 				.B   (temp_r0),   
-				.S   (Ez_s_out)     	
+				.S   (Ez_n_o)     	
 				);
 ///////
 endmodule

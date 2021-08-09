@@ -1,4 +1,4 @@
-module multi_gen_0
+module mult_gen_0
 #(parameter WIDTH = 32)
 (
 	input 					CLK,

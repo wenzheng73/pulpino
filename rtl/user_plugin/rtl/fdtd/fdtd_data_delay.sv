@@ -17,10 +17,12 @@ always @(posedge CLK or negedge RST_N)begin
 	if (!RST_N)begin
 		temp_r0 <= 'd0;
 		temp_r1 <= 'd0;
+	end
 	else begin
 		temp_r0 <= data_i;
 		temp_r1 <= temp_r0;
 	end
+end
 //
 assign data_o = temp_r1;
 //

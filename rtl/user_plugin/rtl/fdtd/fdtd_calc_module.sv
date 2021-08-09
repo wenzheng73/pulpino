@@ -10,8 +10,7 @@
 module fdtd_calc_module
 #(	parameter	FDTD_DATA_WIDTH = 32,
 	parameter	CUT_LT          = 51,
-	parameter	CUT_RT          = 21,
-
+	parameter	CUT_RT          = 21
 )
 (
 	input 			          	        CLK,
@@ -46,10 +45,10 @@ fdtd_calc_Hy
 	  .CLK           ( CLK          ),
 	  .RST_N         ( RST_N        ),
 	  //calculation signal 
-	  .calc_Hy_en_i  ( calc_Hy_en_i ),
+	  .clken         ( calc_Hy_en_i ),
 	  //coefficients
 	  .chyh		 ( chyh         ),
-          .cezhy         ( cezhy        ),
+          .chyez         ( chyez        ),
 	  //previous field_data
 	  .Hy_old_i	 ( Hy_old_i     ),
           .Ez_old_i      ( Ez_old_i     ),
@@ -68,7 +67,7 @@ fdtd_calc_Ez
 	  .CLK           ( CLK          ),
 	  .RST_N         ( RST_N        ),
 	  //calculation signal 
-	  .  ( calc_Ez_en_i ),
+	  .clken         ( calc_Ez_en_i ),
 	  //coefficients
 	  .ceze		 ( ceze         ),
           .cezhy         ( cezhy        ),
@@ -93,6 +92,8 @@ fdtd_calc_src
 	  .clken         ( calc_src_en_i),
           //coefficients
 	  .cezj		 ( cezj         ),
+	  //source
+          .Jz            ( Jz 		),
 	  //current timestep's data
 	  .Ez_c_i        ( Ez_old_i     ),
           //new data
@@ -117,5 +118,5 @@ fdtd_data_select
 	  .Ez_n_1_i      ( Ez_n_1        ),
 	  //output data
 	  .Ez_n_o        ( Ez_n_o        )
-	),
+	);
 endmodule

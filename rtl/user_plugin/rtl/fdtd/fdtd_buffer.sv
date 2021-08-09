@@ -91,8 +91,12 @@ always_ff @(posedge CLK or negedge RST_N)
 		begin
 			wrtaddr_Hy_old <= 'd0;  
                         wrtaddr_Ez_old <= 'd0;
+                        rdaddr_Hy_n    <= 'd0;
+                        rdaddr_Ez_n    <= 'd0;
 			rd_Hy_en <= 1'b0;
 			rd_Ez_en <= 1'b0;
+			wrt_Hy_en <= 1'b0;
+			wrt_Ez_en <= 1'b0;
 			BFR_CS <= IDLE;
 		end
 
