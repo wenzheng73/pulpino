@@ -6,7 +6,7 @@
 #define IRQ_IDX 		22
 
 //FDTD PARAMETER
-#define NUMBER_OF_TIME_STEPS 	1
+#define NUMBER_OF_TIME_STEPS 	2
 #define GRID_SIZE	        500
 #define SOURCE_POSITION	        100
 #define BUFFER_SIZE             GRID_SIZE/10
@@ -44,19 +44,19 @@ void fdtd_solve(int grid_size, int number_of_time_steps ){
 
 //define problem space size
 //fixme: redefine 
-int HY[GRID_SIZE+BUFFER_SIZE];
-int EZ[GRID_SIZE+BUFFER_SIZE];
+int Hy[GRID_SIZE+BUFFER_SIZE];
+int Ez[GRID_SIZE+BUFFER_SIZE];
 
 void initialize_field_space(int word_n){
 	printf("initialize problem space!!!\n");
-	for (size_t i=0;i<=sizeof(HY)/sizeof(HY[0]);i=i+1){
-		HY[i] = 0;
+	for (size_t i=0;i<=sizeof(Hy)/sizeof(Hy[0]);i=i+1){
+		Hy[i] = 0;
 	}
-	for (size_t j=0;j<=sizeof(EZ)/sizeof(EZ[0]);j=j+1){
-		EZ[j] = 0;
+	for (size_t j=0;j<=sizeof(Ez)/sizeof(Ez[0]);j=j+1){
+		Ez[j] = 0;
 	}
-	HY_ADDR = (int)HY;
-	EZ_ADDR = (int)EZ;
+	HY_ADDR = (int)Hy;
+	EZ_ADDR = (int)Ez;
 	FDTD_SIZE = word_n;
 }
 void read_coefficient(){
@@ -75,7 +75,7 @@ void read_coefficient(){
 void run_fdtd_loop(int number_of_time_steps){
 	int i,j;
 	FDTD_START_CALC_SIGNAL = FDTD_CALC_CLR_BIT;
-	printf("having fdtd loop!!!\n");
+	printf("Having fdtd loop!!!\n");
 	for (i=0;i<number_of_time_steps;i++){
                 //load field source
 	        load_field_source(i);
@@ -88,11 +88,11 @@ void run_fdtd_loop(int number_of_time_steps){
 		update_field_process();
 		//
 		FDTD_START_CALC_SIGNAL = FDTD_CALC_CLR_BIT;
-		printf("complete a timestep's updating...<_>\n");
+		printf("Complete a timestep's updating...<_>\n");
                 
 	}
-	printf("total timesteps are %d...\n",number_of_time_steps);
-	printf("finishing entire electromagnetic value update. <_><_><_>\n");
+	printf("The whole timestep is %d .\n",number_of_time_steps);
+	printf("Finishing entire electromagnetic value update. <_><_><_>\n");
 }
 
 void load_field_source(int current_timestep){
@@ -161,7 +161,7 @@ void update_Ez_process(){
 }
 
 void update_src_process(int src_position){
-	EZ_ADDR =  (int)(EZ + src_position);
+	EZ_ADDR =  (int)(Ez + src_position);
 	printf("current Ez address :%x .<_>\n", EZ_ADDR);
 	CALC_SRC_SGL = FDTD_CALC_TRIGGER_BIT;
 		while(1){
@@ -171,6 +171,8 @@ void update_src_process(int src_position){
 			printf("update_status:having src calculation process. >_<!!!\n");
 			}else break;
 		}
+	printf("Ez's value of current source_position is %x .\n",Ez[src_position]);
+	EZ_ADDR =  (int)Ez;
 	CALC_SRC_SGL = FDTD_CALC_CLR_BIT;
 }
 

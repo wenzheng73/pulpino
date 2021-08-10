@@ -1,6 +1,6 @@
 `define REG_SIZE_WIDTH  15  // At most 32KB
 `define FDTD_DATA_WIDTH 32
-`define TIME_STEPS      50
+
 
 module fdtd_top
 (
@@ -186,7 +186,6 @@ module fdtd_top
     fdtd_acc 
     #(
     	.FDTD_DATA_WIDTH  ( `FDTD_DATA_WIDTH  	),
-	.TIME_STEPS       ( `TIME_STEPS		),
         .REG_SIZE_WIDTH   ( `REG_SIZE_WIDTH     )	
     )
     fdtd_acc_i

@@ -10,7 +10,6 @@
 module fdtd_acc
 #(
 	parameter	FDTD_DATA_WIDTH 	= 32,
-	parameter	TIME_STEPS      	= 50,
 	parameter 	BUFFER_ADDR_WIDTH	= 6,
 	parameter	REG_SIZE_WIDTH          = 16
 	
@@ -132,7 +131,6 @@ logic  [FDTD_DATA_WIDTH-1:0]	Ez_n;
 //------------control calc process-----------//
     fdtd_calc_ctrl
     	#(
-    		.TIME_STEPS   		(TIME_STEPS),
 		.BUFFER_ADDR_WIDTH	(BUFFER_ADDR_WIDTH),
 		.FDTD_DATA_WIDTH	(FDTD_DATA_WIDTH)
     	)

@@ -64,15 +64,15 @@ logic				rd_Hy_en;
 logic				rd_Ez_en;
 logic 			        buffer_Ez_start;
 logic 			        buffer_Hy_start;
-logic    			wrt_Hy_en;
-logic    			wrt_Ez_en;
+logic    			wrt_Hy_old_en;
+logic    			wrt_Ez_old_en;
 //
 //
 enum logic  [2:0] {	
 		IDLE,
-		BFR_HY_O,
-		BFR_EZ_O,
-		BFR_SRC_O,
+		BFR_HY,
+		BFR_EZ,
+		BFR_SRC,
 		WAIT0,
 		WRT_HY_TO_DM,	
 		WRT_EZ_TO_DM	
@@ -80,8 +80,10 @@ enum logic  [2:0] {
 //
 assign 	en = 1'b1;
 //
-assign  rd_Hy_en    = (BFR_CS == WRT_HY_TO_DM && wrtvalid_sgl_i) ? 1'b1:1'b0;
+assign  wrt_Hy_old_en = (BFR_CS == BFR_HY && wrtvalid_Hy_old_i) ? 1'b1:1'b0;
+assign  wrt_Ez_old_en = ((BFR_CS == BFR_EZ || BFR_CS == BFR_SRC )&& wrtvalid_Ez_old_i) ? 1'b1:1'b0;
 //
+assign  rd_Hy_en    = (BFR_CS == WRT_HY_TO_DM && wrtvalid_sgl_i) ? 1'b1:1'b0;
 assign  rd_Ez_en    = (BFR_CS == WRT_EZ_TO_DM && wrtvalid_sgl_i) ? 1'b1:1'b0;
 //
 //Signal clk delay is done to meet the timing relationship
@@ -99,27 +101,12 @@ always_ff @(posedge CLK or negedge RST_N)
 //
 always_ff @(posedge CLK or negedge RST_N)
 	begin
-		if (!RST_N)begin
-			Hy_old_r <= 'd0;
-			Ez_old_r <= 'd0;
-		end
-		else begin
-			Hy_old_r <= Hy_old_i;
-			Ez_old_r <= Ez_old_i;
-		end
-	end
-
-//
-always_ff @(posedge CLK or negedge RST_N)
-	begin
 		if (!RST_N)
 		begin
 			wrtaddr_Hy_old <= 'd0;  
                         wrtaddr_Ez_old <= 'd0;
                         rdaddr_Hy_n <= 'd0;
                         rdaddr_Ez_n <= 'd0;
-			wrt_Hy_en <= 1'b0;
-			wrt_Ez_en <= 1'b0;
 			BFR_CS <= IDLE;
 		end
 
@@ -131,51 +118,46 @@ always_ff @(posedge CLK or negedge RST_N)
                         wrtaddr_Ez_old <= 'd0;
                         rdaddr_Hy_n <= 'd0;
                         rdaddr_Ez_n <= 'd0;
-			wrt_Hy_en <= 1'b0;
-			wrt_Ez_en <= 1'b0;
 			if (buffer_Hy_start)
-				BFR_CS <= BFR_HY_O;
+				BFR_CS <= BFR_HY;
 			else if (buffer_Ez_start) 
-				BFR_CS <= BFR_EZ_O;
+				BFR_CS <= BFR_EZ;
 			else if (buffer_src_start_i) 
-				BFR_CS <= BFR_SRC_O;
+				BFR_CS <= BFR_SRC;
 			else 
 				BFR_CS <= IDLE;
 	        end
 
-		BFR_HY_O:
+		BFR_HY:
 		begin
 			if(buffer_Hy_end_i)begin
 				BFR_CS <= IDLE;
 			end
 			else begin
-				BFR_CS <= BFR_HY_O;
+				BFR_CS <= BFR_HY;
 				wrtaddr_Hy_old <= wrtvalid_Hy_old_i ? (wrtaddr_Hy_old + 1'b1) : wrtaddr_Hy_old;
-			  	wrt_Hy_en <= wrtvalid_Hy_old_i ? 1'b1:1'b0;
 			end
 		end
 
-		BFR_EZ_O:
+		BFR_EZ:
 		begin
 			if(buffer_Ez_end_i)begin
 				BFR_CS <= WAIT0;
 			end
 			else begin
-				BFR_CS <= BFR_EZ_O;
+				BFR_CS <= BFR_EZ;
 				wrtaddr_Ez_old <= wrtvalid_Ez_old_i ? (wrtaddr_Ez_old + 1'b1) : wrtaddr_Ez_old;
-			  	wrt_Ez_en <= wrtvalid_Ez_old_i ? 1'b1:1'b0;
 			end
 		end
 		
-		BFR_SRC_O:
+		BFR_SRC:
 		begin
 			if(buffer_src_end_i)begin
 				BFR_CS <= WAIT0;
 			end
 			else begin
-				BFR_CS <= BFR_SRC_O;
+				BFR_CS <= BFR_SRC;
 				wrtaddr_Ez_old <= wrtvalid_Ez_old_i ? (wrtaddr_Ez_old + 1'b1) : wrtaddr_Ez_old;
-			  	wrt_Ez_en <= wrtvalid_Ez_old_i ? 1'b1:1'b0;
 			end
 		end
 
@@ -223,7 +205,7 @@ fdtd_ram
 		.RST_N	(RST_N),	
 		.en	(en),	
 		.rden 	(rd_Hy_old_en_i),	
-		.wren 	(wrt_Hy_en),	
+		.wren 	(wrt_Hy_old_en),	
 		.addr_a (wrtaddr_Hy_old),	
 		.addr_b (rd_Hy_old_addr_i),	
 		.din	(Hy_old_r),	
@@ -240,7 +222,7 @@ fdtd_ram
 		.RST_N	(RST_N),	
 		.en	(en),	
 		.rden 	(rd_Ez_old_en_i),	
-		.wren 	(wrt_Ez_en),	
+		.wren 	(wrt_Ez_old_en),	
 		.addr_a (wrtaddr_Ez_old),	
 		.addr_b (rd_Ez_old_addr_i),	
 		.din	(Ez_old_r),	

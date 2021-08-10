@@ -138,7 +138,7 @@ module fdtd_mem_ctrl
     //data_mem -> ram_buffer
     //write field_value data
     assign s_w_data          = wt_Hy_sgl ? Hy_n_i   : 
-	    		      ((wt_Ez_sgl||wt_src_sgl) ? Ez_n_i   : 'd0);
+	    		      ((wt_Ez_sgl||wt_src_sgl) ? Ez_n_i  : 'd0);
 
     //read/write address
     assign r_r_word_addr     = rd_Hy_sgl ? r_r_Hy_word_addr :
@@ -147,9 +147,7 @@ module fdtd_mem_ctrl
 	    		      ((wt_Ez_sgl||wt_src_sgl) ? r_w_Ez_word_addr : 'd0);
 
     //signal of writing field_value data to data_mem 
-    assign wrtvalid_sgl_o    = ((r_CS == WAIT_WRITE_HY || r_CS == WAIT_WRITE_EZ|| r_CS == WAIT_WRITE_SRC)
-    			     &&mstr.w_valid&&mstr.w_ready) 
-			     ? 1'b1 : 1'b0;
+    assign wrtvalid_sgl_o    = (r_CS == WAIT_WRITE_HY || r_CS == WAIT_WRITE_EZ|| r_CS == WAIT_WRITE_SRC)? 1'b1 : 1'b0;
     //data_mem -> ram_buffer
     //read data valid signal 
     assign rdvalid_Hy_o_o    =  (rd_Hy_sgl & mstr.r_valid & mstr.r_ready);  
@@ -174,7 +172,9 @@ module fdtd_mem_ctrl
     begin
         if (~ARESETn)
             r_w_data <= 'b0;
-        else if (s_w_data_store)
+        //else if (s_w_data_store)
+          //  r_w_data <= s_w_data;
+	else 
             r_w_data <= s_w_data;
     end
 
@@ -316,7 +316,6 @@ module fdtd_mem_ctrl
 		end
 		else if (wrt_src_start_i)begin
 		   buffer_end_o    = 1'b0;
-		   s_w_data_store  = 1'b1;
 		   s_CS_n          = INIT_WRITE_SRC; 
 		end
 		else begin
@@ -349,6 +348,8 @@ module fdtd_mem_ctrl
 			mem_rd_end_o   = 1'b1;
                         s_CS_n         = INIT_READ_HY;
                     end
+		    else 
+			s_CS_n = WAIT_WRITE_HY;
             end
 	    WAIT_0:
 	    begin
@@ -374,16 +375,17 @@ module fdtd_mem_ctrl
 			mem_rd_end_o   = 1'b1;
                         s_CS_n = WAIT_1;
 		end
-                    else if (nxt_buffer_en)
-                    begin
+                else if (nxt_buffer_en)
+                begin
 			wt_Ez_sgl      = 1'b0;
   			buffer_Hy_start_o   = 1'b1;
 			mem_rd_Ez_en_o = 1'b0;
 			mem_rd_end_o   = 1'b1;
                         s_CS_n         = INIT_READ_HY;
-                    end
+                end
+		else 
+                        s_CS_n = WAIT_WRITE_EZ;
             end
-
 
 	    WAIT_1:
 	    begin
@@ -395,7 +397,6 @@ module fdtd_mem_ctrl
 
 	    INIT_READ_SRC:
 	    begin
-
 	        s_r_req           = 1'b1;
 		buffer_src_start_o= 1'b1;
 		s_CS_n		  = WAIT_READ_SRC;
@@ -411,6 +412,7 @@ module fdtd_mem_ctrl
 		end
 		else if (s_r_gnt)
 		begin
+		    s_r_req           = 1'b0;
 		    buffer_src_start_o= 1'b0;
 		    buffer_src_end_o= 1'b1;
 		    buffer_end_o   = 1'b1;
@@ -427,11 +429,12 @@ module fdtd_mem_ctrl
             end
 
 	    WAIT_WRITE_SRC:
-            begin
-                s_w_req = 1'b1;
+            begin 
 		wt_src_sgl = 1'b1;
 		if (~s_w_gnt)begin
+		    s_w_req = 1'b0;
 		    mem_rd_end_o    = 1'b1;
+		    s_w_data_store  = 1'b1;
                     s_CS_n = WAIT_WRITE_SRC;
 		end
                 else if(s_w_gnt)
@@ -570,11 +573,11 @@ always_ff @(posedge ACLK, negedge ARESETn)
 			r_w_Ez_word_addr <= (mstr.aw_valid && mstr.aw_ready)? (r_w_Ez_word_addr + 1'b1) : r_w_Ez_word_addr; 
 			r_word_size      <= (mstr.aw_valid && mstr.aw_ready)? (r_word_size - 1'b1) : r_word_size;
 		end
-		WAIT_READ_SRC:
+		INIT_READ_SRC:
 		begin
 			r_r_Ez_word_addr <= Ez_addr_i[mstr.AXI_ADDR_WIDTH-1:2];
 		end
-		WAIT_WRITE_SRC:
+		INIT_WRITE_SRC:
 		begin
 			r_w_Ez_word_addr <= Ez_addr_i[mstr.AXI_ADDR_WIDTH-1:2];
 		end
