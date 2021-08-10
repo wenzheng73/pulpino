@@ -59,10 +59,10 @@ module fdtd_top
     logic			       calc_Ez_end_flg;
     logic			       calc_src_end_flg;
     //
-    logic [mstr.AXI_DATA_WIDTH - 1: 0] HY_old;
-    logic [mstr.AXI_DATA_WIDTH - 1: 0] EZ_old;
-    logic [mstr.AXI_DATA_WIDTH - 1: 0] HY_n;
-    logic [mstr.AXI_DATA_WIDTH - 1: 0] EZ_n;
+    logic [mstr.AXI_DATA_WIDTH - 1: 0] Hy_old;
+    logic [mstr.AXI_DATA_WIDTH - 1: 0] Ez_old;
+    logic [mstr.AXI_DATA_WIDTH - 1: 0] Hy_n;
+    logic [mstr.AXI_DATA_WIDTH - 1: 0] Ez_n;
     //ram_buffer size
     logic [mstr.AXI_DATA_WIDTH - 1: 0] buffer_size;
     //
@@ -166,10 +166,10 @@ module fdtd_top
 	.rdvalid_Hy_o_o	      ( rdvalid_Hy           ),
 	.rdvalid_Ez_o_o	      ( rdvalid_Ez           ),
 	//read/write data
-	.HY_old_o	      ( HY_old		     ),
-	.EZ_old_o	      ( EZ_old		     ),
-	.HY_n_i	      	      ( HY_n		     ),
-	.EZ_n_i		      ( EZ_n		     ),
+	.Hy_old_o	      ( Hy_old		     ),
+	.Ez_old_o	      ( Ez_old		     ),
+	.Hy_n_i	      	      ( Hy_n		     ),
+	.Ez_n_i		      ( Ez_n		     ),
         //user logic
         .size_i               ( s_size               ),
         .ctrl_int_en_i        ( s_ctrl_int_en        ),
@@ -228,10 +228,10 @@ module fdtd_top
         .coe0                   ( coe0                  ),
         .Jz		        ( Jz                    ),
 	//
-	.HY_old_i		( HY_old		),
-	.EZ_old_i		( EZ_old		),
-	.HY_N_o			( HY_n   		),
-	.EZ_N_o			( EZ_n 		        )	
+	.Hy_old_i		( Hy_old		),
+	.Ez_old_i		( Ez_old		),
+	.Hy_n_o			( Hy_n   		),
+	.Ez_n_o			( Ez_n 		        )	
     );
 	
 //

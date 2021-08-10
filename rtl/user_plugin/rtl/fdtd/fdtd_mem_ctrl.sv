@@ -1,7 +1,8 @@
 module fdtd_mem_ctrl
 #(
     parameter REG_SIZE_WIDTH = 16,
-    parameter AXI4_LENTH     = 16
+    parameter AXI4_LENTH     = 16,
+    parameter BUFFER_SIZE    = 50
 )
 (
     input logic     ACLK,
@@ -36,10 +37,10 @@ module fdtd_mem_ctrl
     input  logic [mstr.AXI_ADDR_WIDTH-1:0]  Hy_addr_i,
     input  logic [mstr.AXI_ADDR_WIDTH-1:0]  Ez_addr_i,
     // read/write data
-    input  logic [mstr.AXI_DATA_WIDTH-1:0]  HY_n_i, 
-    input  logic [mstr.AXI_DATA_WIDTH-1:0]  EZ_n_i, 
-    output logic [mstr.AXI_DATA_WIDTH-1:0]  HY_old_o,
-    output logic [mstr.AXI_DATA_WIDTH-1:0]  EZ_old_o,
+    input  logic [mstr.AXI_DATA_WIDTH-1:0]  Hy_n_i, 
+    input  logic [mstr.AXI_DATA_WIDTH-1:0]  Ez_n_i, 
+    output logic [mstr.AXI_DATA_WIDTH-1:0]  Hy_old_o,
+    output logic [mstr.AXI_DATA_WIDTH-1:0]  Ez_old_o,
     // data_mem -> ram_buffer
     output logic			    buffer_Hy_start_o,
     output logic			    buffer_Ez_start_o,
@@ -76,13 +77,13 @@ module fdtd_mem_ctrl
     // Data Reading/Writing Processing //////
     /////////////////////////////////////////
 
-    logic [mstr.AXI_ADDR_WIDTH-2-1: 0] r_r_Hy_word_addr;  // Read Hy address by word
-    logic [mstr.AXI_ADDR_WIDTH-2-1: 0] r_r_Ez_word_addr;  // Read Ez address by word
-    logic [mstr.AXI_ADDR_WIDTH-2-1: 0] r_r_word_addr;     // Read    address by word
-    logic [mstr.AXI_ADDR_WIDTH-2-1: 0] r_w_Hy_word_addr;  // Write Hy address by word
-    logic [mstr.AXI_ADDR_WIDTH-2-1: 0] r_w_Ez_word_addr;  // Write Ez address by word
-    logic [mstr.AXI_ADDR_WIDTH-2-1: 0] r_w_word_addr;     // Write    address by word
-    logic [REG_SIZE_WIDTH - 2 - 1: 0]  r_word_size;       // Remaining number of words
+    logic [mstr.AXI_ADDR_WIDTH-2-1: 0]     r_r_Hy_word_addr;  // Read Hy address by word
+    logic [mstr.AXI_ADDR_WIDTH-2-1: 0]     r_r_Ez_word_addr;  // Read Ez address by word
+    logic [mstr.AXI_ADDR_WIDTH-2-1: 0]     r_r_word_addr;     // Read    address by word
+    logic [mstr.AXI_ADDR_WIDTH-2-1: 0]     r_w_Hy_word_addr;  // Write Hy address by word
+    logic [mstr.AXI_ADDR_WIDTH-2-1: 0]     r_w_Ez_word_addr;  // Write Ez address by word
+    logic [mstr.AXI_ADDR_WIDTH-2-1: 0]     r_w_word_addr;     // Write    address by word
+    logic [REG_SIZE_WIDTH - 2 - 1: 0]      r_word_size;       // Remaining number of words
 
     logic                                  s_r_req;  // Read memory request
     logic [mstr.AXI_DATA_WIDTH - 1: 0]     s_r_data;
@@ -136,8 +137,8 @@ module fdtd_mem_ctrl
     //assign s_w_data = {s_r_data[$size(s_r_data) - 2: 0], 1'b0};
     //data_mem -> ram_buffer
     //write field_value data
-    assign s_w_data          = wt_Hy_sgl ? HY_n_i   : 
-	    		      ((wt_Ez_sgl||wt_src_sgl) ? EZ_n_i   : 'd0);
+    assign s_w_data          = wt_Hy_sgl ? Hy_n_i   : 
+	    		      ((wt_Ez_sgl||wt_src_sgl) ? Ez_n_i   : 'd0);
 
     //read/write address
     assign r_r_word_addr     = rd_Hy_sgl ? r_r_Hy_word_addr :
@@ -146,7 +147,7 @@ module fdtd_mem_ctrl
 	    		      ((wt_Ez_sgl||wt_src_sgl) ? r_w_Ez_word_addr : 'd0);
 
     //signal of writing field_value data to data_mem 
-    assign wrtvalid_sgl_o    = ((r_CS == WAIT_WRITE_HY || r_CS == WAIT_WRITE_EZ)
+    assign wrtvalid_sgl_o    = ((r_CS == WAIT_WRITE_HY || r_CS == WAIT_WRITE_EZ|| r_CS == WAIT_WRITE_SRC)
     			     &&mstr.w_valid&&mstr.w_ready) 
 			     ? 1'b1 : 1'b0;
     //data_mem -> ram_buffer
@@ -155,17 +156,16 @@ module fdtd_mem_ctrl
     assign rdvalid_Ez_o_o    =  ((rd_Ez_sgl||rd_src_sgl) & mstr.r_valid & mstr.r_ready); 
 
     //read field_value data
-    assign HY_old_o          = rd_Hy_sgl ? s_r_data : 'd0;
-    assign EZ_old_o          = (rd_Ez_sgl||rd_src_sgl) ? s_r_data : 'd0;
+    assign Hy_old_o          = rd_Hy_sgl ? s_r_data : 'd0;
+    assign Ez_old_o          = (rd_Ez_sgl||rd_src_sgl) ? s_r_data : 'd0;
     //
-    assign buffer_Hy_last    = ((record_num_cnt == buffer_size_i[REG_SIZE_WIDTH-1:0])
+    assign buffer_Hy_last    = ((record_num_cnt == BUFFER_SIZE)
     				&&rd_Hy_sgl)? 1'b1:1'b0;
-    assign buffer_Ez_last    = ((record_num_cnt == buffer_size_i[REG_SIZE_WIDTH-1:0])
+    assign buffer_Ez_last    = ((record_num_cnt == BUFFER_SIZE)
     				&&(rd_Ez_sgl||rd_src_sgl))? 1'b1:1'b0;
 
-    assign nxt_buffer_en     = ((record_num_cnt == buffer_size_i[REG_SIZE_WIDTH-1:0])
-    				&&(r_CS == WAIT_WRITE_HY || r_CS == WAIT_WRITE_EZ))
-				? 1'b1:1'b0;   
+    assign nxt_buffer_en     = ((record_num_cnt == BUFFER_SIZE)
+    				&&(r_CS == WAIT_WRITE_HY || r_CS == WAIT_WRITE_EZ))? 1'b1:1'b0;   
     assign calc_Hy_end_flg_o = calc_Hy_end_flg;
     assign calc_Ez_end_flg_o = calc_Ez_end_flg;
     assign calc_src_end_flg_o = calc_src_end_flg;
@@ -338,12 +338,13 @@ module fdtd_mem_ctrl
                 s_w_req = 1'b1;
 		wt_Hy_sgl = 1'b1;
 		    if (r_word_size == 'b0)begin
-			//calc_Hy_end_flg_o = 1'b1;
+			mem_rd_end_o = 1'b1;
                         s_CS_n = WAIT_0;
 		    end
                     else if (nxt_buffer_en)
                     begin
 			wt_Hy_sgl      = 1'b0;
+			buffer_Hy_start_o   = 1'b1;
 			mem_rd_Hy_en_o = 1'b0;
 			mem_rd_end_o   = 1'b1;
                         s_CS_n         = INIT_READ_HY;
@@ -370,12 +371,13 @@ module fdtd_mem_ctrl
                 s_w_req = 1'b1;
 		wt_Ez_sgl = 1'b1;
 		if (r_word_size == 'b0)begin
-
+			mem_rd_end_o   = 1'b1;
                         s_CS_n = WAIT_1;
 		end
                     else if (nxt_buffer_en)
                     begin
 			wt_Ez_sgl      = 1'b0;
+  			buffer_Hy_start_o   = 1'b1;
 			mem_rd_Ez_en_o = 1'b0;
 			mem_rd_end_o   = 1'b1;
                         s_CS_n         = INIT_READ_HY;
@@ -428,16 +430,17 @@ module fdtd_mem_ctrl
             begin
                 s_w_req = 1'b1;
 		wt_src_sgl = 1'b1;
-                if (~s_w_gnt)
+		if (~s_w_gnt)begin
+		    mem_rd_end_o    = 1'b1;
                     s_CS_n = WAIT_WRITE_SRC;
-                    else if(s_w_gnt)
-                    begin
-
+		end
+                else if(s_w_gnt)
+                begin
 			wt_src_sgl      = 1'b0;
 			mem_rd_Ez_en_o  = 1'b0;
 			mem_rd_end_o    = 1'b1;
                         s_CS_n          = WAIT_2;
-                    end
+                end
             end
             
 	    WAIT_2:
@@ -496,28 +499,28 @@ always_ff @(posedge ACLK, negedge ARESETn)
 		if (!ARESETn)
 			record_num_cnt <= 'd0;
 		else if (r_CS == WAIT_READ_HY)begin
-			if (record_num_cnt == buffer_size_i[REG_SIZE_WIDTH-1:0])
+			if (record_num_cnt == BUFFER_SIZE)
 				record_num_cnt <= 'd0;
 			else
 			record_num_cnt <= (mstr.r_valid & mstr.r_ready)?(record_num_cnt + 1'b1) 
 						: record_num_cnt;
 		end
 		else if (r_CS == WAIT_READ_EZ)begin
-			if (record_num_cnt == buffer_size_i[REG_SIZE_WIDTH-1:0])
+			if (record_num_cnt == BUFFER_SIZE)
 				record_num_cnt <= 'd0;
 			else
 			record_num_cnt <= (mstr.r_valid & mstr.r_ready)?(record_num_cnt + 1'b1) 
 						: record_num_cnt;
 		end	
 		else if (r_CS == WAIT_WRITE_HY)begin
-			if (record_num_cnt == buffer_size_i[REG_SIZE_WIDTH-1:0])
+			if (record_num_cnt == BUFFER_SIZE)
 				record_num_cnt <= 'd0;
 			else
 			record_num_cnt <= (mstr.w_valid&mstr.w_ready)
 				?(record_num_cnt + 1'b1) : record_num_cnt;
 		end			
 		else if (r_CS == WAIT_WRITE_EZ)begin
-			if (record_num_cnt == buffer_size_i[REG_SIZE_WIDTH-1:0])
+			if (record_num_cnt == BUFFER_SIZE)
 				record_num_cnt <= 'd0;
 			else
 			record_num_cnt <= (mstr.w_valid&mstr.w_ready)
@@ -547,7 +550,7 @@ always_ff @(posedge ACLK, negedge ARESETn)
             		r_w_Hy_word_addr <= Hy_addr_i[mstr.AXI_ADDR_WIDTH-1:2];
             		r_w_Ez_word_addr <= Ez_addr_i[mstr.AXI_ADDR_WIDTH-1:2];
 			//r_word_size      <= size_i[REG_SIZE_WIDTH-1:2];
-			r_word_size      <= size_i-1'b1;
+			r_word_size      <= size_i-'d10;
 		end
 		WAIT_READ_HY:
 		begin

@@ -13,7 +13,8 @@ module fdtd_calc_ctrl
 	parameter	FDTD_DATA_WIDTH         = 16 ,
 	parameter	HY_PIPE_LEN		= 3  ,
 	parameter	EZ_PIPE_LEN		= 3  ,
-	parameter	SRC_PIPE_LEN		= 2  
+	parameter	SRC_PIPE_LEN		= 2  , 
+	parameter	BUFFER_SIZE		= 50  
 )
 (
 	input      				CLK,
@@ -62,8 +63,8 @@ logic 				wrt_Hy_start;
 logic 				wrt_Ez_start;
 logic 				wrt_src_start;
 //
-assign	calc_Hy_end_flg  = (calc_num_cnt == buffer_size_i[BUFFER_ADDR_WIDTH-1:0]) ? 1'b1 :1'b0;
-assign	calc_Ez_end_flg  = (calc_num_cnt == buffer_size_i[BUFFER_ADDR_WIDTH-1:0]) ? 1'b1 :1'b0;
+assign	calc_Hy_end_flg  = (calc_num_cnt == BUFFER_SIZE) ? 1'b1 :1'b0;
+assign	calc_Ez_end_flg  = (calc_num_cnt == BUFFER_SIZE) ? 1'b1 :1'b0;
 assign  rd_Hy_old_addr_o = rd_Hy_old_addr ;
 assign  rd_Ez_old_addr_o = rd_Ez_old_addr ;
 assign  wrt_Hy_n_addr_o  = wrt_Hy_n_addr  ;
@@ -192,9 +193,9 @@ always_ff @(posedge CLK, negedge RST_N)
 		if (!RST_N)
 			calc_num_cnt <= 'd0;
 		else if (CS_CALC == CALC_HY)
-			calc_num_cnt <= (calc_num_cnt == buffer_size_i[BUFFER_ADDR_WIDTH-1:0]) ? 'd0 : calc_num_cnt + 1'b1;
+			calc_num_cnt <= (calc_num_cnt == BUFFER_SIZE) ? 'd0 : calc_num_cnt + 1'b1;
 		else if (CS_CALC == CALC_EZ)
-			calc_num_cnt <= (calc_num_cnt == buffer_size_i[BUFFER_ADDR_WIDTH-1:0]) ? 'd0 : calc_num_cnt + 1'b1;
+			calc_num_cnt <= (calc_num_cnt == BUFFER_SIZE) ? 'd0 : calc_num_cnt + 1'b1;
 		else
 			calc_num_cnt <=  'd0;
 	end

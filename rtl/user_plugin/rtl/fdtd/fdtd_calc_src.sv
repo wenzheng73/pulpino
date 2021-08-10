@@ -28,21 +28,21 @@ always @(posedge CLK or negedge RST_N)begin
 		temp_r0 <= Ez_c_i;
 end
 ///////
-mult_gen_0		multi_Jz_inst0 (
-				.CLK	( CLK ),////
-				.CE	( clken),
-				.A 	( cezj ),///
-				.B 	( Jz ),///material coefficient
-				.P	( cut_data0 )
-				);
+mult_gen_0	multi_Jz_inst0 (
+			.CLK	( CLK ),////
+			.CE	( clken),
+			.A 	( cezj ),///
+			.B 	( Jz ),///material coefficient
+			.P	( cut_data0 )
+			);
 ///////
-c_addsub_0		add_Ez_inst0	(
-				.ADD (1'b1),
-				.CE  (clken),
-				.CLK (CLK),    
-				.A   ({cut_data0[CUT_WIDTH-1],cut_data0[CUT_LT:CUT_RT]}),  
-				.B   (temp_r0),   
-				.S   (Ez_n_o)     	
-				);
+c_addsub_0	add_Ez_inst0	(
+			.ADD (1'b1),
+			.CE  (clken),
+			.CLK (CLK),    
+			.A   ({cut_data0[CUT_WIDTH-1],cut_data0[CUT_LT:CUT_RT]}),  
+			.B   (temp_r0),   
+			.S   (Ez_n_o)     	
+			);
 ///////
 endmodule

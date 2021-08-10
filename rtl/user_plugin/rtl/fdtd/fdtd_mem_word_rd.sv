@@ -54,7 +54,8 @@ module fdtd_mem_word_rd
 );
 
 logic [AXI4_ADDR_WIDTH - 1: 0] s_r_addr;
-reg   [7:0]		       read_burst_cnt;
+logic [7:0]		       read_burst_cnt;
+logic			       rd_req;
 // Extend word addr to byte addr
 assign s_r_addr =  {rd_word_addr_i,2'h0};
 ////////////////////
@@ -74,7 +75,7 @@ assign ARQOS_o    = 'b0;
 
 assign RREADY_o   = 'b1;
 assign rd_data_o  = RDATA_i;
-assign rd_gnt_o   = rd_req_i & RVALID_i & RLAST_i;
+assign rd_gnt_o   = rd_req & RVALID_i & RLAST_i;
 
 enum logic [1:0] {  RS_WAIT_REQ,
                     RS_WAIT_ARREADY,
@@ -88,7 +89,14 @@ begin
     else
         r_RS <= s_RS_n;
 end
-
+//
+always_ff @(posedge ACLK, negedge ARESETn)
+begin
+    if (~ARESETn)
+        rd_req <= 'd0;
+    else
+	rd_req <= rd_req_i;
+end
 // FIXME: Only
 //            RS_WAIT_REQ -> RS_WAIT_RLAST -> RS_WAIT_REQ
 //        state transfers have been accessed.
@@ -111,7 +119,7 @@ begin
     case (r_RS)
         RS_WAIT_REQ:
         begin
-            if (~rd_req_i)
+            if (~rd_req)
                 s_RS_n = RS_WAIT_REQ;
             else
             begin

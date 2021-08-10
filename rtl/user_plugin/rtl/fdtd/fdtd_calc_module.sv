@@ -30,7 +30,7 @@ module fdtd_calc_module
         input  logic signed	[FDTD_DATA_WIDTH-1:0]	Ez_old_i    ,
 	//
 	output logic signed     [FDTD_DATA_WIDTH-1:0]	Hy_n_o,	
-	output logic signed     [FDTD_DATA_WIDTH-1:0]	Ey_n_o	
+	output logic signed     [FDTD_DATA_WIDTH-1:0]	Ez_n_o	
 );
 logic [FDTD_DATA_WIDTH-1:0]	Ez_n_0;
 logic [FDTD_DATA_WIDTH-1:0]	Ez_n_1;

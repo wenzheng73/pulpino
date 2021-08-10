@@ -53,6 +53,8 @@ module fdtd_buffer
 	output  logic	[FDTD_DATA_WIDTH-1:0]	Ez_n_o	
 );
 //
+logic [FDTD_DATA_WIDTH-1:0]	Hy_old_r;
+logic [FDTD_DATA_WIDTH-1:0]	Ez_old_r;
 logic [BUFFER_ADDR_WIDTH-1:0]	wrtaddr_Hy_old;
 logic [BUFFER_ADDR_WIDTH-1:0]	wrtaddr_Ez_old;
 logic [BUFFER_ADDR_WIDTH-1:0]	rdaddr_Hy_n;
@@ -61,19 +63,10 @@ logic				en;
 logic				rd_Hy_en;
 logic				rd_Ez_en;
 logic 			        buffer_Ez_start;
+logic 			        buffer_Hy_start;
 logic    			wrt_Hy_en;
 logic    			wrt_Ez_en;
 //
-assign 	en = 1'b1;
-//
-//Signal clk delay is done to meet the timing relationship
-always_ff @(posedge CLK or negedge RST_N)
-	begin
-		if (!RST_N)
-			buffer_Ez_start <= 1'b0;
-		else 
-			buffer_Ez_start <= buffer_Ez_start_i;
-	end
 //
 enum logic  [2:0] {	
 		IDLE,
@@ -85,16 +78,46 @@ enum logic  [2:0] {
 		WRT_EZ_TO_DM	
 	} BFR_CS;
 //
+assign 	en = 1'b1;
+//
+assign  rd_Hy_en    = (BFR_CS == WRT_HY_TO_DM && wrtvalid_sgl_i) ? 1'b1:1'b0;
+//
+assign  rd_Ez_en    = (BFR_CS == WRT_EZ_TO_DM && wrtvalid_sgl_i) ? 1'b1:1'b0;
+//
+//Signal clk delay is done to meet the timing relationship
+always_ff @(posedge CLK or negedge RST_N)
+	begin
+		if (!RST_N)begin
+			buffer_Ez_start <= 1'b0;
+			buffer_Hy_start <= 1'b0;
+		end
+		else begin
+			buffer_Ez_start <= buffer_Ez_start_i;
+			buffer_Hy_start <= buffer_Hy_start_i;
+		end
+	end
+//
+always_ff @(posedge CLK or negedge RST_N)
+	begin
+		if (!RST_N)begin
+			Hy_old_r <= 'd0;
+			Ez_old_r <= 'd0;
+		end
+		else begin
+			Hy_old_r <= Hy_old_i;
+			Ez_old_r <= Ez_old_i;
+		end
+	end
+
+//
 always_ff @(posedge CLK or negedge RST_N)
 	begin
 		if (!RST_N)
 		begin
 			wrtaddr_Hy_old <= 'd0;  
                         wrtaddr_Ez_old <= 'd0;
-                        rdaddr_Hy_n    <= 'd0;
-                        rdaddr_Ez_n    <= 'd0;
-			rd_Hy_en <= 1'b0;
-			rd_Ez_en <= 1'b0;
+                        rdaddr_Hy_n <= 'd0;
+                        rdaddr_Ez_n <= 'd0;
 			wrt_Hy_en <= 1'b0;
 			wrt_Ez_en <= 1'b0;
 			BFR_CS <= IDLE;
@@ -106,9 +129,11 @@ always_ff @(posedge CLK or negedge RST_N)
 		begin
 			wrtaddr_Hy_old <= 'd0;  
                         wrtaddr_Ez_old <= 'd0;
-			rd_Hy_en <= 1'b0;
-			rd_Ez_en <= 1'b0;	
-			if (buffer_Hy_start_i)
+                        rdaddr_Hy_n <= 'd0;
+                        rdaddr_Ez_n <= 'd0;
+			wrt_Hy_en <= 1'b0;
+			wrt_Ez_en <= 1'b0;
+			if (buffer_Hy_start)
 				BFR_CS <= BFR_HY_O;
 			else if (buffer_Ez_start) 
 				BFR_CS <= BFR_EZ_O;
@@ -126,7 +151,7 @@ always_ff @(posedge CLK or negedge RST_N)
 			else begin
 				BFR_CS <= BFR_HY_O;
 				wrtaddr_Hy_old <= wrtvalid_Hy_old_i ? (wrtaddr_Hy_old + 1'b1) : wrtaddr_Hy_old;
-			  wrt_Hy_en <= wrtvalid_Hy_old_i ? 1'b1:1'b0;
+			  	wrt_Hy_en <= wrtvalid_Hy_old_i ? 1'b1:1'b0;
 			end
 		end
 
@@ -138,7 +163,7 @@ always_ff @(posedge CLK or negedge RST_N)
 			else begin
 				BFR_CS <= BFR_EZ_O;
 				wrtaddr_Ez_old <= wrtvalid_Ez_old_i ? (wrtaddr_Ez_old + 1'b1) : wrtaddr_Ez_old;
-			  wrt_Ez_en <= wrtvalid_Ez_old_i ? 1'b1:1'b0;
+			  	wrt_Ez_en <= wrtvalid_Ez_old_i ? 1'b1:1'b0;
 			end
 		end
 		
@@ -150,7 +175,7 @@ always_ff @(posedge CLK or negedge RST_N)
 			else begin
 				BFR_CS <= BFR_SRC_O;
 				wrtaddr_Ez_old <= wrtvalid_Ez_old_i ? (wrtaddr_Ez_old + 1'b1) : wrtaddr_Ez_old;
-			  wrt_Ez_en <= wrtvalid_Ez_old_i ? 1'b1:1'b0;
+			  	wrt_Ez_en <= wrtvalid_Ez_old_i ? 1'b1:1'b0;
 			end
 		end
 
@@ -169,17 +194,18 @@ always_ff @(posedge CLK or negedge RST_N)
 		begin
 			if (mem_rd_end_i)begin
 				BFR_CS <= IDLE;
-				rdaddr_Hy_n <= wrtvalid_sgl_i ?  (rdaddr_Hy_n + 1'b1):rdaddr_Hy_n;
-				rd_Hy_en <= wrtvalid_sgl_i ? 1'b1:1'b0;
 			end
+			else 
+     				rdaddr_Hy_n <= wrtvalid_sgl_i ?  (rdaddr_Hy_n + 1'b1):rdaddr_Hy_n;	
 		end
 		WRT_EZ_TO_DM:
 		begin
 			if (mem_rd_end_i)begin
 				BFR_CS <= IDLE;
-				rdaddr_Ez_n <= wrtvalid_sgl_i ?  (rdaddr_Ez_n + 1'b1):rdaddr_Ez_n;
-				rd_Ez_en <= wrtvalid_sgl_i ? 1'b1:1'b0;
 			end
+			else
+				rdaddr_Ez_n <= wrtvalid_sgl_i ?  (rdaddr_Ez_n + 1'b1):rdaddr_Ez_n;
+;
 		end
 		
 		default:BFR_CS <= IDLE;
@@ -191,7 +217,6 @@ fdtd_ram
 	#(	.FDTD_DATA_WIDTH 	(FDTD_DATA_WIDTH),
 		.BUFFER_ADDR_WIDTH	(BUFFER_ADDR_WIDTH),
 		.BUFFER_RAM_DEPTH       (FDTD_BUFFER_DEPTH)
-
 	)
 	Hy_old_ram_i(
 		.CLK	(CLK),	
@@ -201,7 +226,7 @@ fdtd_ram
 		.wren 	(wrt_Hy_en),	
 		.addr_a (wrtaddr_Hy_old),	
 		.addr_b (rd_Hy_old_addr_i),	
-		.din	(Hy_old_i),	
+		.din	(Hy_old_r),	
 		.dout   (Hy_old_o)	
 	);
 //Ez field_value data of previous timestep
@@ -218,7 +243,7 @@ fdtd_ram
 		.wren 	(wrt_Ez_en),	
 		.addr_a (wrtaddr_Ez_old),	
 		.addr_b (rd_Ez_old_addr_i),	
-		.din	(Ez_old_i),	
+		.din	(Ez_old_r),	
 		.dout   (Ez_old_o)	
 	);
 //Hy field_value data of current timestep 

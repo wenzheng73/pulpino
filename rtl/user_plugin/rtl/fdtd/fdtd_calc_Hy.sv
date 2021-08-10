@@ -28,9 +28,6 @@ wire	signed	[CUT_WIDTH-1:0]			cut_data0;
 wire	signed	[CUT_WIDTH-1:0]			cut_data1;
 /////////////////////////////////////////////////////////
 wire 	signed 	[FDTD_DATA_WIDTH-1:0]		old_data;
-/////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////			
-wire 	signed 	[FDTD_DATA_WIDTH-1:0]		chyez_0;
 //
 always @(posedge CLK or negedge RST_N)begin
 	if (!RST_N)begin

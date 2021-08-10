@@ -28,7 +28,7 @@
 `define REG_CALC_HY_SGL       8'h12   // BASEADDR + 0x48
 `define REG_CALC_EZ_SGL       8'h13   // BASEADDR + 0x4C
 `define REG_CALC_SRC_SGL      8'h14   // BASEADDR + 0x50
-`define REG_UPDATE_END_SGL    8'h15// BASEADDR + 0x54
+`define REG_UPDATE_END_SGL    8'h15   // BASEADDR + 0x54
 `define REG_CALC_STATUS       8'h16   // BASEADDR + 0x58
 
 

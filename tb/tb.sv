@@ -69,7 +69,7 @@ module tb;
     end
 
     $fflush();
-    $stop;
+    $finish;
   end
 
 endmodule

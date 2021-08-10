@@ -45,21 +45,21 @@ module fdtd_acc
 	//field source	
 	input  	logic	signed   [FDTD_DATA_WIDTH-1:0]	Jz,	
 	//previous timestep field_value
-	input  	logic	signed   [FDTD_DATA_WIDTH-1:0]	HY_old_i,
-	input	logic	signed   [FDTD_DATA_WIDTH-1:0]	EZ_old_i,
+	input  	logic	signed   [FDTD_DATA_WIDTH-1:0]	Hy_old_i,
+	input	logic	signed   [FDTD_DATA_WIDTH-1:0]	Ez_old_i,
 	//current timestep field_value
-	output 	logic   signed   [FDTD_DATA_WIDTH-1:0]	HY_N_o,
-	output 	logic   signed   [FDTD_DATA_WIDTH-1:0]	EZ_N_o,
+	output 	logic   signed   [FDTD_DATA_WIDTH-1:0]	Hy_n_o,
+	output 	logic   signed   [FDTD_DATA_WIDTH-1:0]	Ez_n_o,
 	//ram_buffer -> data_mem
 	//observation point data
-	output	logic	[FDTD_DATA_WIDTH-1:0]	sample_point_o,
-	input	logic			        mem_rd_Hy_en_i,	
-	input	logic			        mem_rd_Ez_en_i,	
-	input	logic			        mem_rd_end_i,
-	input	logic			        wrtvalid_sgl_i,	
-	output	logic				wrt_Hy_start_o,
-	output	logic				wrt_Ez_start_o,
-	output	logic				wrt_src_start_o
+	output	logic	[FDTD_DATA_WIDTH-1:0]	        sample_point_o,
+	input	logic			                mem_rd_Hy_en_i,	
+	input	logic			                mem_rd_Ez_en_i,	
+	input	logic			                mem_rd_end_i,
+	input	logic			                wrtvalid_sgl_i,	
+	output	logic			        	wrt_Hy_start_o,
+	output	logic			        	wrt_Ez_start_o,
+	output	logic			        	wrt_src_start_o
 );
 //
 logic			        rd_Hy_old_en;
@@ -117,16 +117,16 @@ logic  [FDTD_DATA_WIDTH-1:0]	Ez_n;
 		.wrt_Hy_n_addr_i   	( wrt_Hy_n_addr     ),
 		.wrt_Ez_n_addr_i   	( wrt_Ez_n_addr     ),
 		//old data
-		.Hy_old_i		( HY_old_i	    ),
-		.Ez_old_i		( EZ_old_i	    ),
+		.Hy_old_i		( Hy_old_i	    ),
+		.Ez_old_i		( Ez_old_i	    ),
 		//participate calculation
 		.Hy_old_o		( Hy_old	    ),
 		.Ez_old_o		( Ez_old	    ),
 		//new data
 		.Hy_n_i			( Hy_n              ),
 		.Ez_n_i			( Ez_n		    ),
-		.Ez_n_o			( EZ_N_o	    ),
-		.Hy_n_o			( HY_N_o	    )
+		.Ez_n_o			( Ez_n_o	    ),
+		.Hy_n_o			( Hy_n_o	    )
 	);
 
 //------------control calc process-----------//
@@ -189,6 +189,6 @@ logic  [FDTD_DATA_WIDTH-1:0]	Ez_n;
 		.Ez_old_i	( Ez_old	),
 		//
 		.Hy_n_o		( Hy_n		),
-		.Ey_n_o		( Ez_n		)
+		.Ez_n_o		( Ez_n		)
 	);
 endmodule

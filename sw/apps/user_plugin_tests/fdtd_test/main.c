@@ -6,7 +6,7 @@
 #define IRQ_IDX 		22
 
 //FDTD PARAMETER
-#define NUMBER_OF_TIME_STEPS 	400
+#define NUMBER_OF_TIME_STEPS 	1
 #define GRID_SIZE	        500
 #define SOURCE_POSITION	        100
 #define BUFFER_SIZE             GRID_SIZE/10
@@ -43,23 +43,21 @@ void fdtd_solve(int grid_size, int number_of_time_steps ){
 }
 
 //define problem space size
+//fixme: redefine 
 int HY[GRID_SIZE+BUFFER_SIZE];
 int EZ[GRID_SIZE+BUFFER_SIZE];
 
 void initialize_field_space(int word_n){
-	int i,j;
 	printf("initialize problem space!!!\n");
-	for (i=0;i<=sizeof(HY);i=i+1){
+	for (size_t i=0;i<=sizeof(HY)/sizeof(HY[0]);i=i+1){
 		HY[i] = 0;
 	}
-	for (j=0;j<=sizeof(EZ);j=j+1){
+	for (size_t j=0;j<=sizeof(EZ)/sizeof(EZ[0]);j=j+1){
 		EZ[j] = 0;
 	}
 	HY_ADDR = (int)HY;
 	EZ_ADDR = (int)EZ;
 	FDTD_SIZE = word_n;
-	//fixme:hardware define
-	REG_BUFFER_SIZE = BUFFER_SIZE;
 }
 void read_coefficient(){
 	    
@@ -80,7 +78,7 @@ void run_fdtd_loop(int number_of_time_steps){
 	printf("having fdtd loop!!!\n");
 	for (i=0;i<number_of_time_steps;i++){
                 //load field source
-	        load_field_source();
+	        load_field_source(i);
 
 	        //trigger calculation
 	 	FDTD_START_CALC_SIGNAL = FDTD_CALC_TRIGGER_BIT;
@@ -93,10 +91,11 @@ void run_fdtd_loop(int number_of_time_steps){
 		printf("complete a timestep's updating...<_>\n");
                 
 	}
+	printf("total timesteps are %d...\n",number_of_time_steps);
 	printf("finishing entire electromagnetic value update. <_><_><_>\n");
 }
 
-void load_field_source(){
+void load_field_source(int current_timestep){
     /*FILE *p = fopen("coe.txt", "r");
     while(!feof(p))
     {
@@ -104,7 +103,13 @@ void load_field_source(){
       fclose(p);*/
 
 	printf("load field source data!!!\n");
-	FDTD_SOURCE  =  0x00020261;
+	if (current_timestep == 0){
+		FDTD_SOURCE  =  0x00020261;
+	}
+	if (current_timestep == 1){
+		FDTD_SOURCE  =  0x000402BB;
+	}
+	
 }
 
 void buffer_data(){
