@@ -8,7 +8,7 @@
 //FDTD PARAMETER
 #define NUMBER_OF_TIME_STEPS 	2
 #define GRID_SIZE	        500
-#define SOURCE_POSITION	        100
+#define SOURCE_POSITION	        128
 #define BUFFER_SIZE             GRID_SIZE/10
 
 #define mb() __asm__ __volatile__ ("" : : : "memory")
@@ -112,19 +112,6 @@ void load_field_source(int current_timestep){
 	
 }
 
-void buffer_data(){
-	while(1){
-	        int buffer_end = BUFFER_STATUS;
-		printf("buffer_end:%d\n",buffer_end);
-		if (!buffer_end){
-		printf("buffer_status:having buffer data. <_>!!!\n");
-		}else{
-		printf("buffer_status:finishing buffer data. >_<!!!\n");
-	        return;
-		}
-	}
-}
-
 void update_field_process(){
 	CALC_HY_SGL  = FDTD_CALC_CLR_BIT;
 	CALC_EZ_SGL  = FDTD_CALC_CLR_BIT;   
@@ -144,8 +131,11 @@ void update_Hy_process(){
 		printf("calc_Hy_status:%d. <_>\n",calc_Hy_status);
 		if(calc_Hy_status){
 		printf("update_status:having Hy calculation process. >_<!!!\n");
-		}else break;
+		}else {
+			break;
+		}
 	}
+	printf("This position's Hy field_value is: Hy[%d] = %x .\n",SOURCE_POSITION-1, Hy[SOURCE_POSITION-1]);
 	CALC_HY_SGL = FDTD_CALC_CLR_BIT;
 }
 void update_Ez_process(){
@@ -155,13 +145,16 @@ void update_Ez_process(){
 		printf("calc_Ez_status:%d. <_>\n",calc_Ez_status);
 		if(calc_Ez_status){
 		printf("update_status:having Ez calculation process. >_<!!!\n");
-		}else break;	
+		}else {
+			break;
+		}	
 	}
+	printf("This position's Ez field_value is: Ez[%d] = %x .\n",SOURCE_POSITION-1, Ez[SOURCE_POSITION-1]);
 	CALC_EZ_SGL = FDTD_CALC_CLR_BIT;
 }
 
 void update_src_process(int src_position){
-	EZ_ADDR =  (int)(Ez + src_position);
+	EZ_ADDR =  (int)(Ez + src_position-1);
 	printf("current Ez address :%x .<_>\n", EZ_ADDR);
 	CALC_SRC_SGL = FDTD_CALC_TRIGGER_BIT;
 		while(1){
@@ -169,13 +162,19 @@ void update_src_process(int src_position){
 			printf("calc_src_status:%d. <_>\n",calc_src_status);
 			if(calc_src_status){
 			printf("update_status:having src calculation process. >_<!!!\n");
-			}else break;
+			}else {
+				break;
+			}
 		}
-	printf("Ez's value of current source_position is %x .\n",Ez[src_position]);
+	printf("Ez's value of current source_position is %x .\n",Ez[src_position-1]);
 	EZ_ADDR =  (int)Ez;
 	CALC_SRC_SGL = FDTD_CALC_CLR_BIT;
 }
-
+//
+void compare_observation_point_error(){
+         printf("Test is doing!!!!\n");
+}
+//
 void set_wo_irq(){
 
     mb();
@@ -218,17 +217,7 @@ void set_wo_irq(){
         }
     }
 }
-//
-#define ideal_sampling_data [NUMBER_OF_TIME_STEPS] 
-void compare_observation_point_error(){
-	 int sample_point = FDTD_SOURCE;
-	 int ceze_v = FDTD_CEZE;
-         if (ceze_v = 0x00200000){
-         printf("ceze is 0x%x.\n",ceze_v);
-	 printf("verify successful!!!\n");
-	 }
-         printf("Test is doing!!!!\n");
-}
+
 //------------------------------------------------------------//
 // Must use volatile,
 // because it is used to communicate between IRQ and main thread.

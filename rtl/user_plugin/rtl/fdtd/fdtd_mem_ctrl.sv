@@ -147,7 +147,7 @@ module fdtd_mem_ctrl
 	    		      ((wt_Ez_sgl||wt_src_sgl) ? r_w_Ez_word_addr : 'd0);
 
     //signal of writing field_value data to data_mem 
-    assign wrtvalid_sgl_o    = (r_CS == WAIT_WRITE_HY || r_CS == WAIT_WRITE_EZ|| r_CS == WAIT_WRITE_SRC)? 1'b1 : 1'b0;
+    assign wrtvalid_sgl_o    = ((r_CS == WAIT_WRITE_HY || r_CS == WAIT_WRITE_EZ || r_CS == WAIT_WRITE_SRC)&&mstr.aw_valid&&mstr.aw_ready)? 1'b1 : 1'b0;
     //data_mem -> ram_buffer
     //read data valid signal 
     assign rdvalid_Hy_o_o    =  (rd_Hy_sgl & mstr.r_valid & mstr.r_ready);  
@@ -553,7 +553,7 @@ always_ff @(posedge ACLK, negedge ARESETn)
             		r_w_Hy_word_addr <= Hy_addr_i[mstr.AXI_ADDR_WIDTH-1:2];
             		r_w_Ez_word_addr <= Ez_addr_i[mstr.AXI_ADDR_WIDTH-1:2];
 			//r_word_size      <= size_i[REG_SIZE_WIDTH-1:2];
-			r_word_size      <= size_i-'d10;
+			r_word_size      <= size_i;
 		end
 		WAIT_READ_HY:
 		begin

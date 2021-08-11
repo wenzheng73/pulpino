@@ -53,8 +53,6 @@ module fdtd_buffer
 	output  logic	[FDTD_DATA_WIDTH-1:0]	Ez_n_o	
 );
 //
-logic [FDTD_DATA_WIDTH-1:0]	Hy_old_r;
-logic [FDTD_DATA_WIDTH-1:0]	Ez_old_r;
 logic [BUFFER_ADDR_WIDTH-1:0]	wrtaddr_Hy_old;
 logic [BUFFER_ADDR_WIDTH-1:0]	wrtaddr_Ez_old;
 logic [BUFFER_ADDR_WIDTH-1:0]	rdaddr_Hy_n;
@@ -208,7 +206,7 @@ fdtd_ram
 		.wren 	(wrt_Hy_old_en),	
 		.addr_a (wrtaddr_Hy_old),	
 		.addr_b (rd_Hy_old_addr_i),	
-		.din	(Hy_old_r),	
+		.din	(Hy_old_i),	
 		.dout   (Hy_old_o)	
 	);
 //Ez field_value data of previous timestep
@@ -225,7 +223,7 @@ fdtd_ram
 		.wren 	(wrt_Ez_old_en),	
 		.addr_a (wrtaddr_Ez_old),	
 		.addr_b (rd_Ez_old_addr_i),	
-		.din	(Ez_old_r),	
+		.din	(Ez_old_i),	
 		.dout   (Ez_old_o)	
 	);
 //Hy field_value data of current timestep 
