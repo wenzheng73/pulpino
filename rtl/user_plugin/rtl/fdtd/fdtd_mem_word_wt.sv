@@ -59,7 +59,6 @@ module fdtd_mem_word_wt
 );
 
 logic [AXI4_ADDR_WIDTH - 1: 0] s_w_addr;
-logic			       wt_req_r;
 assign s_w_addr = {wt_word_addr_i, 2'h0};  // Extend word addr to byte addr
 
 assign AWID_o     = 'b0;
@@ -95,15 +94,6 @@ begin
     else
         r_WS <= s_WS_n;
 end
-//
-always_ff @(posedge ACLK, negedge ARESETn)
-begin
-    if (~ARESETn)
-        wt_req_r <= 'd0;
-    else
-	wt_req_r <= wt_req_i;
-end
-
 // FIXME: Only
 //            WS_WAIT_REQ -> WS_WRITE -> WS_WAIT_BVALID -> WS_WAIT_REQ
 //        state transfers have been accessed.
@@ -119,7 +109,7 @@ begin
     case (r_WS)
         WS_WAIT_REQ:
         begin
-            if (~wt_req_r)
+            if (~wt_req_i)
                 s_WS_n = WS_WAIT_REQ;
             else
             begin

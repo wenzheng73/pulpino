@@ -160,8 +160,7 @@ module fdtd_mem_ctrl
     assign buffer_Hy_last    = ((record_num_cnt == BUFFER_SIZE)
     				&&rd_Hy_sgl)? 1'b1:1'b0;
     assign buffer_Ez_last    = ((record_num_cnt == BUFFER_SIZE)
-    				&&(rd_Ez_sgl||rd_src_sgl))? 1'b1:1'b0;
-
+    				&&rd_Ez_sgl)? 1'b1:1'b0;
     assign nxt_buffer_en     = ((record_num_cnt == BUFFER_SIZE)
     				&&(r_CS == WAIT_WRITE_HY || r_CS == WAIT_WRITE_EZ))? 1'b1:1'b0;   
     assign calc_Hy_end_flg_o = calc_Hy_end_flg;
@@ -221,6 +220,7 @@ module fdtd_mem_ctrl
             IDLE:
             begin
                 status_busy_o = 1'b0;
+  	        s_r_req       = 1'b0;
 		if (~fdtd_start_signal_i)begin
                     s_CS_n = IDLE;
 		    /*calc_Hy_end_flg_o= 1'b0; 
@@ -230,13 +230,12 @@ module fdtd_mem_ctrl
                 else
                 begin
                     s_CS_n            = INIT_READ_HY;
-		    buffer_Hy_start_o   = 1'b1;
+		    buffer_Hy_start_o = 1'b1;
                 end
             end
 
             INIT_READ_HY:
 	    begin
-                s_r_req   = 1'b1;
                 s_CS_n    = WAIT_READ_HY;
 		mem_rd_end_o   = 1'b0;
 	    end
@@ -244,21 +243,22 @@ module fdtd_mem_ctrl
             WAIT_READ_HY:
             begin
                 s_r_req           = 1'b1;
-		buffer_Hy_start_o   = 1'b0;
+		buffer_Hy_start_o = 1'b0;
 		rd_Hy_sgl         = 1'b1;
 		/*if (~s_r_gnt)begin
                     s_CS_n = WAIT_READ_HY;
 		end*/
 	    	if (buffer_Hy_last)begin
 	    	    buffer_Hy_end_o   = 1'b1;
+                    s_r_req           = 1'b0;
 		    s_CS_n            = INIT_READ_EZ;
 		    buffer_Ez_start_o   = 1'b1;
+
 		end
             end
 
 	    INIT_READ_EZ:
             begin
-                s_r_req   = 1'b1;
                 s_CS_n    = WAIT_READ_EZ;
 		rd_Hy_sgl = 1'b0;
             end
@@ -272,6 +272,7 @@ module fdtd_mem_ctrl
 		if (buffer_Ez_last)begin
 		    buffer_Ez_end_o= 1'b1;
 		    buffer_end_o   = 1'b1;
+                    s_r_req        = 1'b0;
                     s_CS_n         = INIT_CALC_PROCESS;
                 end
             end
@@ -326,7 +327,6 @@ module fdtd_mem_ctrl
 	    
             INIT_WRITE_HY:
             begin
-                s_w_req   = 1'b1;
 		mem_rd_Hy_en_o = 1'b1;
                 s_CS_n    = WAIT_WRITE_HY;
 		wt_Hy_sgl = 1'b1;
@@ -397,7 +397,6 @@ module fdtd_mem_ctrl
 
 	    INIT_READ_SRC:
 	    begin
-	        s_r_req           = 1'b1;
 		buffer_src_start_o= 1'b1;
 		s_CS_n		  = WAIT_READ_SRC;
 		rd_src_sgl        = 1'b1;    
@@ -501,31 +500,17 @@ always_ff @(posedge ACLK, negedge ARESETn)
 	begin
 		if (!ARESETn)
 			record_num_cnt <= 'd0;
-		else if (r_CS == WAIT_READ_HY)begin
-			if (record_num_cnt == BUFFER_SIZE)
-				record_num_cnt <= 'd0;
-			else
-			record_num_cnt <= (mstr.r_valid & mstr.r_ready)?(record_num_cnt + 1'b1) 
-						: record_num_cnt;
+		else if (r_CS == WAIT_READ_HY)begin	
+			record_num_cnt <= (mstr.r_valid & mstr.r_ready)?(record_num_cnt + 1'b1) : record_num_cnt;
 		end
 		else if (r_CS == WAIT_READ_EZ)begin
-			if (record_num_cnt == BUFFER_SIZE)
-				record_num_cnt <= 'd0;
-			else
-			record_num_cnt <= (mstr.r_valid & mstr.r_ready)?(record_num_cnt + 1'b1) 
-						: record_num_cnt;
+			record_num_cnt <= (mstr.r_valid & mstr.r_ready)?(record_num_cnt + 1'b1) : record_num_cnt;
 		end	
 		else if (r_CS == WAIT_WRITE_HY)begin
-			if (record_num_cnt == BUFFER_SIZE)
-				record_num_cnt <= 'd0;
-			else
 			record_num_cnt <= (mstr.w_valid&mstr.w_ready)
 				?(record_num_cnt + 1'b1) : record_num_cnt;
 		end			
 		else if (r_CS == WAIT_WRITE_EZ)begin
-			if (record_num_cnt == BUFFER_SIZE)
-				record_num_cnt <= 'd0;
-			else
 			record_num_cnt <= (mstr.w_valid&mstr.w_ready)
 				?(record_num_cnt + 1'b1) : record_num_cnt;
 		end

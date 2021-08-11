@@ -8,7 +8,7 @@
 //FDTD PARAMETER
 #define NUMBER_OF_TIME_STEPS 	2
 #define GRID_SIZE	        500
-#define SOURCE_POSITION	        128
+#define SOURCE_POSITION	        250
 #define BUFFER_SIZE             GRID_SIZE/10
 
 #define mb() __asm__ __volatile__ ("" : : : "memory")
@@ -135,7 +135,7 @@ void update_Hy_process(){
 			break;
 		}
 	}
-	printf("This position's Hy field_value is: Hy[%d] = %x .\n",SOURCE_POSITION-1, Hy[SOURCE_POSITION-1]);
+	printf("This position's Hy field_value is: Hy[%d] = %x .\n",SOURCE_POSITION, Hy[SOURCE_POSITION-1]);
 	CALC_HY_SGL = FDTD_CALC_CLR_BIT;
 }
 void update_Ez_process(){
@@ -149,7 +149,7 @@ void update_Ez_process(){
 			break;
 		}	
 	}
-	printf("This position's Ez field_value is: Ez[%d] = %x .\n",SOURCE_POSITION-1, Ez[SOURCE_POSITION-1]);
+	printf("This position's Ez field_value is: Ez[%d] = %x .\n",SOURCE_POSITION, Ez[SOURCE_POSITION-1]);
 	CALC_EZ_SGL = FDTD_CALC_CLR_BIT;
 }
 

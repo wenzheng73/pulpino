@@ -55,7 +55,6 @@ module fdtd_mem_word_rd
 
 logic [AXI4_ADDR_WIDTH - 1: 0] s_r_addr;
 logic [7:0]		       read_burst_cnt;
-logic			       rd_req_r;
 // Extend word addr to byte addr
 assign s_r_addr =  {rd_word_addr_i,2'h0};
 ////////////////////
@@ -89,14 +88,6 @@ begin
     else
         r_RS <= s_RS_n;
 end
-//
-always_ff @(posedge ACLK, negedge ARESETn)
-begin
-    if (~ARESETn)
-        rd_req_r <= 'd0;
-    else
-	rd_req_r <= rd_req_i;
-end
 // FIXME: Only
 //            RS_WAIT_REQ -> RS_WAIT_RLAST -> RS_WAIT_REQ
 //        state transfers have been accessed.
@@ -119,7 +110,7 @@ begin
     case (r_RS)
         RS_WAIT_REQ:
         begin
-            if (~rd_req_r)
+            if (~rd_req_i)
                 s_RS_n = RS_WAIT_REQ;
             else
             begin
