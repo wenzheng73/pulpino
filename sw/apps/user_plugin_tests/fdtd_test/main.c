@@ -78,7 +78,7 @@ void run_fdtd_loop(int number_of_time_steps){
 	printf("Having fdtd loop!!!\n");
 	for (i=0;i<number_of_time_steps;i++){
 		//
-		printf("-----current's timestep is %d .-----\n",i);
+		printf("-----current's timestep is %d .-----\n",i+1);
                 //load field source
 	        load_field_source(i);
 
