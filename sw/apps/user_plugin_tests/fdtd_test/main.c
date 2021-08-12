@@ -6,10 +6,10 @@
 #define IRQ_IDX 		22
 
 //FDTD PARAMETER
-#define NUMBER_OF_TIME_STEPS 	2
-#define GRID_SIZE	        500
-#define SOURCE_POSITION	        250
-#define BUFFER_SIZE             GRID_SIZE/10
+#define NUMBER_OF_TIME_STEPS 	50
+#define GRID_SIZE	        100
+#define SOURCE_POSITION	        50
+#define UNUSED_SIZE             50 
 
 #define mb() __asm__ __volatile__ ("" : : : "memory")
 
@@ -44,8 +44,8 @@ void fdtd_solve(int grid_size, int number_of_time_steps ){
 
 //define problem space size
 //fixme: redefine 
-int Hy[GRID_SIZE+BUFFER_SIZE];
-int Ez[GRID_SIZE+BUFFER_SIZE];
+int Hy[GRID_SIZE+UNUSED_SIZE];
+int Ez[GRID_SIZE+UNUSED_SIZE];
 
 void initialize_field_space(int word_n){
 	printf("initialize problem space!!!\n");
@@ -77,6 +77,8 @@ void run_fdtd_loop(int number_of_time_steps){
 	FDTD_START_CALC_SIGNAL = FDTD_CALC_CLR_BIT;
 	printf("Having fdtd loop!!!\n");
 	for (i=0;i<number_of_time_steps;i++){
+		//
+		printf("-----current's timestep is %d .-----\n",i);
                 //load field source
 	        load_field_source(i);
 
@@ -103,11 +105,157 @@ void load_field_source(int current_timestep){
       fclose(p);*/
 
 	printf("load field source data!!!\n");
-	if (current_timestep == 0){
-		FDTD_SOURCE  =  0x00020261;
-	}
-	if (current_timestep == 1){
-		FDTD_SOURCE  =  0x000402BB;
+	switch (current_timestep){
+		case 0: 
+			FDTD_SOURCE  =  0x00020261;
+			break;
+                case 1:
+			FDTD_SOURCE  =  0x000402BB;
+			break;
+                case 2: 
+			FDTD_SOURCE  =  0x0005FF07;
+			break;
+                case 3: 
+			FDTD_SOURCE  =  0x0007F544;
+			break;
+                case 4: 
+			FDTD_SOURCE  =  0x0009E378;
+			break;
+                case 5: 
+			FDTD_SOURCE  =  0x000BC7AD;
+			break;
+                case 6: 
+			FDTD_SOURCE  =  0x000D9FFC;
+			break;
+                case 7: 
+			FDTD_SOURCE  =  0x000F6A87;
+			break;
+                case 8: 
+			FDTD_SOURCE  =  0x0011257E;
+			break;
+                case 9: 
+			FDTD_SOURCE  =  0x0012CF23;
+			break;
+                case 10: 
+			FDTD_SOURCE  =  0x001465C7;
+			break;
+                case 11: 
+			FDTD_SOURCE  =  0x0015E7CF;
+			break;
+                case 12: 
+			FDTD_SOURCE  =  0x001753B6;
+			break;
+                case 13: 
+			FDTD_SOURCE  =  0x0018A80B;
+			break;
+                case 14: 
+			FDTD_SOURCE  =  0x0019E378;
+			break;
+                case 15: 
+			FDTD_SOURCE  =  0x001B04BC;
+			break;
+                case 16: 
+			FDTD_SOURCE  =  0x001C0AB4;
+			break;
+                case 17: 
+			FDTD_SOURCE  =  0x001CF458;
+			break;
+                case 18: 
+			FDTD_SOURCE  =  0x001DC0BB;
+			break;
+                case 19: 
+			FDTD_SOURCE  =  0x001E6F0E;
+			break;
+                case 20: 
+			FDTD_SOURCE  =  0x001EFEA2;
+			break;
+                case 21: 
+			FDTD_SOURCE  =  0x001F6EE6;
+			break;
+                case 22: 
+			FDTD_SOURCE  =  0x001FBF67;
+			break;
+                case 23: 
+			FDTD_SOURCE  =  0x001FEFD6;
+			break;
+                case 24: 
+			FDTD_SOURCE  =  0x00200000;
+			break;
+                case 25: 
+			FDTD_SOURCE  =  0x001FEFD6;
+			break;
+                case 26: 
+			FDTD_SOURCE  =  0x001FBF67;
+			break;
+                case 27: 
+			FDTD_SOURCE  =  0x001F6EE6;
+			break;
+                case 28: 
+			FDTD_SOURCE  =  0x001EFEA2;
+			break;
+                case 29: 
+			FDTD_SOURCE  =  0x001E6F0E;
+			break;
+                case 30: 
+			FDTD_SOURCE  =  0x001DC0BB;
+			break;
+                case 31: 
+			FDTD_SOURCE  =  0x001CF458;
+			break;
+                case 32: 
+			FDTD_SOURCE  =  0x001C0AB4;
+			break;
+                case 33: 
+			FDTD_SOURCE  =  0x001B04BC;
+			break;
+                case 34: 
+			FDTD_SOURCE  =  0x0019E378;
+			break;
+                case 35: 
+			FDTD_SOURCE  =  0x0018A80B;
+			break;
+                case 36: 
+			FDTD_SOURCE  =  0x001753B6;
+			break;
+                case 37: 
+			FDTD_SOURCE  =  0x0015E7CF;
+			break;
+                case 38: 
+			FDTD_SOURCE  =  0x001465C7;
+			break;
+                case 39: 
+			FDTD_SOURCE  =  0x0012CF23;
+			break;
+                case 40: 
+			FDTD_SOURCE  =  0x0011257E;
+			break;
+                case 41: 
+			FDTD_SOURCE  =  0x000F6A87;
+			break;
+                case 42: 
+			FDTD_SOURCE  =  0x000D9FFC;
+			break;
+                case 43: 
+			FDTD_SOURCE  =  0x000BC7AD;
+			break;
+                case 44: 
+			FDTD_SOURCE  =  0x0009E378;
+			break;
+                case 45: 
+			FDTD_SOURCE  =  0x0007F544;
+			break;
+                case 46: 
+			FDTD_SOURCE  =  0x0005FF07;
+			break;
+                case 47: 
+			FDTD_SOURCE  =  0x000402BB;
+			break;
+	        case 48: 
+			FDTD_SOURCE  =  0x00020261;
+			break;
+                case 49: 
+			FDTD_SOURCE  =  0x0005FF07;
+			break;
 	}
 	
 }
@@ -116,12 +264,12 @@ void update_field_process(){
 	CALC_HY_SGL  = FDTD_CALC_CLR_BIT;
 	CALC_EZ_SGL  = FDTD_CALC_CLR_BIT;   
 	CALC_SRC_SGL = FDTD_CALC_CLR_BIT;
-	update_Hy_process();
-	update_Ez_process();
-	update_src_process(SOURCE_POSITION);
+	update_Hy_process(SOURCE_POSITION-1);
+	update_Ez_process(SOURCE_POSITION-1);
+	update_src_process(SOURCE_POSITION-1);
 }
 
-void update_Hy_process(){
+void update_Hy_process(int src_position){
 	//buffer data	
 	//buffer_data();
 	CALC_HY_SGL = FDTD_CALC_TRIGGER_BIT;
@@ -135,10 +283,10 @@ void update_Hy_process(){
 			break;
 		}
 	}
-	printf("This position's Hy field_value is: Hy[%d] = %x .\n",SOURCE_POSITION, Hy[SOURCE_POSITION-1]);
+	printf("this position's Hy field_value is: Hy[%d] = %d .\n",src_position, Hy[src_position]);
 	CALC_HY_SGL = FDTD_CALC_CLR_BIT;
 }
-void update_Ez_process(){
+void update_Ez_process(int src_position){
 	CALC_EZ_SGL = FDTD_CALC_TRIGGER_BIT;
 	while(1){
 		int calc_Ez_status = CALC_EZ_SGL;
@@ -149,12 +297,12 @@ void update_Ez_process(){
 			break;
 		}	
 	}
-	printf("This position's Ez field_value is: Ez[%d] = %x .\n",SOURCE_POSITION, Ez[SOURCE_POSITION-1]);
+	printf("this position's Ez field_value is: Ez[%d] = %d .\n",src_position, Ez[src_position]);
 	CALC_EZ_SGL = FDTD_CALC_CLR_BIT;
 }
 
 void update_src_process(int src_position){
-	EZ_ADDR =  (int)(Ez + src_position-1);
+	EZ_ADDR =  (int)(Ez + src_position);
 	printf("current Ez address :%x .<_>\n", EZ_ADDR);
 	CALC_SRC_SGL = FDTD_CALC_TRIGGER_BIT;
 		while(1){
@@ -166,7 +314,7 @@ void update_src_process(int src_position){
 				break;
 			}
 		}
-	printf("Ez's value of current source_position is %x .\n",Ez[src_position-1]);
+	printf("this position's Ez field_value is: Ez[%d] = %d .\n",src_position,Ez[src_position]);
 	EZ_ADDR =  (int)Ez;
 	CALC_SRC_SGL = FDTD_CALC_CLR_BIT;
 }

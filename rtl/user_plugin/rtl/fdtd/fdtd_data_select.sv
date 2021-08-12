@@ -35,7 +35,7 @@ always @(*)
 		case(select0)
 			2'b10: 	Ez_n_o = Ez_n_0_i;
 			2'b01: 	Ez_n_o = Ez_n_1_i;
-			default:Ez_n_o = 'b0;	
+			default:Ez_n_o = 'd0;	
 		endcase
 	end	
 //

@@ -57,17 +57,13 @@ logic 				calc_Hy_end_flg;
 logic 				calc_Ez_end_flg;
 logic 				rd_Hy_old_en;
 logic 				rd_Ez_old_en;
+logic 				rd_Ez_old_en_r;
 logic 				wrt_Hy_n_en;
 logic 				wrt_Ez_n_en;
 logic 				wrt_Hy_start;
 logic 				wrt_Ez_start;
 logic 				wrt_src_start;
-//delay signal Hy's writing
-logic                           wrt_Hy_n_en_r0;
-logic                           wrt_Hy_n_en_r1;
-//delay signal Ez's writing
-logic                           wrt_Ez_n_en_r0;
-logic                           wrt_Ez_n_en_r1;
+
 //
 enum logic [3:0] {	IDLE,
 			CALC_HY,
@@ -86,9 +82,9 @@ assign  wrt_Hy_n_addr_o  = wrt_Hy_n_addr  ;
 assign  wrt_Ez_n_addr_o  = wrt_Ez_n_addr  ; 
 //
 assign  rd_Hy_old_en_o   = rd_Hy_old_en   ;   
-assign  rd_Ez_old_en_o   = rd_Ez_old_en   ;
-assign  wrt_Hy_n_en_o    = wrt_Hy_n_en_r1 ;
-assign  wrt_Ez_n_en_o    = (CS_CALC == WAIT_SRC_END) ? 1'b1 : wrt_Ez_n_en_r1 ;
+assign  rd_Ez_old_en_o   = rd_Ez_old_en || rd_Ez_old_en_r  ;
+assign  wrt_Hy_n_en_o    = wrt_Hy_n_en ;
+assign  wrt_Ez_n_en_o    = (CS_CALC == WAIT_SRC_END) ? 1'b1 : wrt_Ez_n_en ;
 //
 assign  calc_Hy_en_o     = calc_Hy_en     ;
 assign  calc_Ez_en_o     = calc_Ez_en     ;
@@ -207,7 +203,6 @@ always_ff @(posedge CLK, negedge RST_N)
 			calc_num_cnt <=  'd0;
 	end
 //
-//--------generate driving signal of mem_ctrl module--------//
 always_ff @(posedge CLK or negedge RST_N)
 	begin
 		if (!RST_N)begin
@@ -291,59 +286,80 @@ always_comb
 	     endcase
      end
 //
+always_ff @(posedge CLK ,negedge RST_N)begin
+	if (!RST_N)
+          rd_Ez_old_en_r <= 1'b0;
+	else if (CS_CALC == CALC_HY || CS_CALC == WAIT_HY_END)
+	  rd_Ez_old_en_r <= rd_Ez_old_en;
+	else
+	  rd_Ez_old_en_r <= 1'b0;
+end
+//
+//--------generate driving signal of mem_ctrl module--------//
+//delay signal Hy's writing
+logic                           wrt_Hy_n_en_r0;
+logic                           wrt_Hy_n_en_r1;
+logic                           wrt_Hy_n_en_r2;
+logic                           wrt_Hy_n_en_r3;
+//delay signal Ez's writing
+logic                           wrt_Ez_n_en_r0;
+logic                           wrt_Ez_n_en_r1;
+logic                           wrt_Ez_n_en_r2;
+logic                           wrt_Ez_n_en_r3;
+//
 always_ff @(posedge CLK ,negedge RST_N)
 	begin
 		if (!RST_N)begin
-        	        wrt_Hy_n_en  <= 1'b0;   
-        	        wrt_Ez_n_en  <= 1'b0;
-			calc_Hy_en   <= 1'b0;
-			calc_Ez_en   <= 1'b0;
-			calc_src_en  <= 1'b0;
+        	        wrt_Hy_n_en_r0  <= 1'b0;   
+        	        wrt_Ez_n_en_r0  <= 1'b0;
+			calc_Hy_en      <= 1'b0;
+			calc_Ez_en      <= 1'b0;
+			calc_src_en     <= 1'b0;
 		end
 		else case(CS_CALC)
 		IDLE:	begin
-				wrt_Hy_n_en  <= 1'b0; wrt_Ez_n_en  <= 1'b0;
+				wrt_Hy_n_en_r0  <= 1'b0; wrt_Ez_n_en_r0  <= 1'b0;
 				calc_Hy_en   <= 1'b0; calc_Ez_en   <= 1'b0;
 				calc_src_en  <= 1'b0;
 			end
 		CALC_HY:begin
-				wrt_Hy_n_en  <= 1'b1; wrt_Ez_n_en  <= 1'b0;
+				wrt_Hy_n_en_r0  <= 1'b1; wrt_Ez_n_en_r0  <= 1'b0;
 				calc_Hy_en   <= 1'b1; calc_Ez_en   <= 1'b0;
 				calc_src_en  <= 1'b0;
 			end
 
 		WAIT_HY_END:begin
-				wrt_Hy_n_en  <= 1'b0; wrt_Ez_n_en  <= 1'b0;
+				wrt_Hy_n_en_r0  <= 1'b0; wrt_Ez_n_en_r0  <= 1'b0;
 				calc_Hy_en   <= 1'b1; calc_Ez_en   <= 1'b0;
 				calc_src_en  <= 1'b0;
 			end
 
 		CALC_EZ:begin
-				wrt_Hy_n_en  <= 1'b0; wrt_Ez_n_en  <= 1'b1;
+				wrt_Hy_n_en_r0  <= 1'b0; wrt_Ez_n_en_r0  <= 1'b1;
 				calc_Hy_en   <= 1'b0; calc_Ez_en   <= 1'b1;
 				calc_src_en  <= 1'b0;
 			end
 
 		WAIT_EZ_END:begin
-				wrt_Hy_n_en  <= 1'b0; wrt_Ez_n_en  <= 1'b0;
+				wrt_Hy_n_en_r0  <= 1'b0; wrt_Ez_n_en_r0  <= 1'b0;
 				calc_Hy_en   <= 1'b0; calc_Ez_en   <= 1'b1;
 				calc_src_en  <= 1'b0;
 			end
 
 		LOAD_SRC:begin
-				wrt_Hy_n_en  <= 1'b0; wrt_Ez_n_en  <= 1'b0;
+				wrt_Hy_n_en_r0  <= 1'b0; wrt_Ez_n_en_r0  <= 1'b0;
 				calc_Hy_en   <= 1'b0; calc_Ez_en   <= 1'b0;
 				calc_src_en  <= 1'b1;
 			end
 
 		WAIT_SRC_END:begin
-				wrt_Hy_n_en  <= 1'b0; wrt_Ez_n_en  <= 1'b0;
+				wrt_Hy_n_en_r0  <= 1'b0; wrt_Ez_n_en_r0  <= 1'b0;
 				calc_Hy_en   <= 1'b0; calc_Ez_en   <= 1'b0;
 				calc_src_en  <= 1'b1;
 			end
 
 		default:begin
-				wrt_Hy_n_en  <= 1'b0; wrt_Ez_n_en  <= 1'b0;
+				wrt_Hy_n_en_r0  <= 1'b0; wrt_Ez_n_en_r0  <= 1'b0;
 				calc_Hy_en   <= 1'b0; calc_Ez_en   <= 1'b0;
 				calc_src_en  <= 1'b0;
 			end
@@ -354,25 +370,32 @@ always_ff @(posedge CLK ,negedge RST_N)
 always_ff @(posedge CLK, negedge RST_N)
 	begin
 		if (!RST_N)begin
-			wrt_Hy_n_en_r0 <= 1'b0;
+			wrt_Hy_n_en    <= 1'b0;
 			wrt_Hy_n_en_r1 <= 1'b0;
+			wrt_Hy_n_en_r2 <= 1'b0;
+			wrt_Hy_n_en_r3 <= 1'b0;
 		end
 		else begin
-	                wrt_Hy_n_en_r0 <= wrt_Hy_n_en;
 	                wrt_Hy_n_en_r1 <= wrt_Hy_n_en_r0;
+	                wrt_Hy_n_en_r2 <= wrt_Hy_n_en_r1;
+                        wrt_Hy_n_en_r3 <= wrt_Hy_n_en_r2;
+                        wrt_Hy_n_en    <= wrt_Hy_n_en_r3;
 		end
 	end
-//
 //
 always_ff @(posedge CLK, negedge RST_N)
 	begin
 		if (!RST_N)begin
-			wrt_Ez_n_en_r0 <= 1'b0;
+			wrt_Ez_n_en    <= 1'b0;
 			wrt_Ez_n_en_r1 <= 1'b0;
+			wrt_Ez_n_en_r2 <= 1'b0;
+			wrt_Ez_n_en_r3 <= 1'b0;
 		end
-		else if (CS_CALC == CALC_EZ || CS_CALC == WAIT_EZ_END)begin
-	                wrt_Ez_n_en_r0 <= wrt_Ez_n_en;
+		else begin
 	                wrt_Ez_n_en_r1 <= wrt_Ez_n_en_r0;
+	                wrt_Ez_n_en_r2 <= wrt_Ez_n_en_r1;
+	                wrt_Ez_n_en_r3 <= wrt_Ez_n_en_r2;
+	                wrt_Ez_n_en    <= wrt_Ez_n_en_r3;
 		end
 	end
 //--------generate read/write address of RAM--------------//
@@ -405,7 +428,7 @@ logic [BUFFER_ADDR_WIDTH-1:0]	wrt_Hy_n_addr_r1;
 logic [BUFFER_ADDR_WIDTH-1:0]	wrt_Ez_n_addr_r0;
 logic [BUFFER_ADDR_WIDTH-1:0]	wrt_Ez_n_addr_r1;
 //
-always_ff @(posedge CLK, negedge RST_N )
+/*always_ff @(posedge CLK, negedge RST_N )
 	begin
 		if (!RST_N)begin
 			wrt_Hy_n_addr <= 'd0;
@@ -439,7 +462,27 @@ always_ff @(posedge CLK, negedge RST_N )
 		else begin
 			wrt_Ez_n_addr <= 'd0;	
 		end
+	end*/
+//
+always_ff @(posedge CLK, negedge RST_N )
+	begin
+		if (!RST_N)begin
+			wrt_Hy_n_addr <= 'd0;
+		end
+		else begin
+			wrt_Hy_n_addr <= wrt_Hy_n_en ? (wrt_Hy_n_addr + 1'b1) : 1'b0;	
+		end
 	end
 
+//
+always_ff @(posedge CLK, negedge RST_N )
+	begin
+		if (!RST_N)begin
+			wrt_Ez_n_addr <= 'd0;
+		end
+		else begin
+			wrt_Ez_n_addr <= wrt_Ez_n_en ? (wrt_Ez_n_addr + 1'b1) : 1'b0;	
+		end
+	end
 //	
  endmodule
