@@ -242,47 +242,39 @@ always_ff @(posedge CLK or negedge RST_N)
 always_comb
 	begin
              if (!RST_N)begin
-	             rd_Hy_old_en <= 1'b0;  
-        	     rd_Ez_old_en <= 1'b0;
+	             rd_Hy_old_en = 1'b0;  rd_Ez_old_en = 1'b0;
 	     end
 	     else case(CS_CALC)
              IDLE: begin
-		     rd_Hy_old_en <= 1'b0;  
-        	     rd_Ez_old_en <= 1'b0;
+		     rd_Hy_old_en = 1'b0;  rd_Ez_old_en = 1'b0;
 		   end
 
              CALC_HY: begin
-		     rd_Hy_old_en <= 1'b1;  
-        	     rd_Ez_old_en <= 1'b1;
+		     rd_Hy_old_en = 1'b1;  rd_Ez_old_en = 1'b1;
 		   end
 	     
 	     WAIT_HY_END: begin
-		     rd_Hy_old_en <= 1'b0;  
-        	     rd_Ez_old_en <= 1'b0;
+		     rd_Hy_old_en = 1'b0;  rd_Ez_old_en = 1'b0;
 		   end
 
 	     CALC_EZ: begin
-		     rd_Hy_old_en <= 1'b1;  
-        	     rd_Ez_old_en <= 1'b1;
+		     rd_Hy_old_en = 1'b1;  rd_Ez_old_en = 1'b1;
 		   end
 
 	     WAIT_EZ_END: begin
-		     rd_Hy_old_en <= 1'b0;  
-        	     rd_Ez_old_en <= 1'b0;
+		     rd_Hy_old_en = 1'b0;  rd_Ez_old_en = 1'b0;
 		   end
 
 	     LOAD_SRC: begin
-		     rd_Hy_old_en <= 1'b1;  
-        	     rd_Ez_old_en <= 1'b1;
+		     rd_Hy_old_en = 1'b1;  rd_Ez_old_en = 1'b1;
 		   end
 
 	     WAIT_SRC_END: begin
-		     rd_Hy_old_en <= 1'b0;  
-        	     rd_Ez_old_en <= 1'b0;
+		     rd_Hy_old_en = 1'b0;  rd_Ez_old_en = 1'b0;
 		   end
+
 	     default:begin
-		     rd_Hy_old_en <= 1'b0;  
-        	     rd_Ez_old_en <= 1'b0;
+		     rd_Hy_old_en = 1'b0;  rd_Ez_old_en = 1'b0;
 		   end
 	     endcase
      end
@@ -318,56 +310,56 @@ always_ff @(posedge CLK ,negedge RST_N)
 		if (!RST_N)begin
         	        wrt_Hy_n_en_r0  <= 1'b0;   
         	        wrt_Ez_n_en_r0  <= 1'b0;
-			calc_Hy_en      <= 1'b0;
+                        calc_Hy_en      <= 1'b0;  
 			calc_Ez_en      <= 1'b0;
 			calc_src_en     <= 1'b0;
 		end
 		else case(CS_CALC)
 		IDLE:	begin
 				wrt_Hy_n_en_r0  <= 1'b0; wrt_Ez_n_en_r0  <= 1'b0;
-				calc_Hy_en   <= 1'b0; calc_Ez_en   <= 1'b0;
-				calc_src_en  <= 1'b0;
+                                calc_Hy_en      <= 1'b0; calc_Ez_en      <= 1'b0;
+				calc_src_en     <= 1'b0;
 			end
 		CALC_HY:begin
 				wrt_Hy_n_en_r0  <= 1'b1; wrt_Ez_n_en_r0  <= 1'b0;
-				calc_Hy_en   <= 1'b1; calc_Ez_en   <= 1'b0;
-				calc_src_en  <= 1'b0;
+                                calc_Hy_en      <= 1'b1; calc_Ez_en      <= 1'b0;
+				calc_src_en     <= 1'b0;
 			end
 
 		WAIT_HY_END:begin
 				wrt_Hy_n_en_r0  <= 1'b0; wrt_Ez_n_en_r0  <= 1'b0;
-				calc_Hy_en   <= 1'b1; calc_Ez_en   <= 1'b0;
-				calc_src_en  <= 1'b0;
+                                calc_Hy_en      <= 1'b1; calc_Ez_en      <= 1'b0;
+				calc_src_en     <= 1'b0;
 			end
 
 		CALC_EZ:begin
 				wrt_Hy_n_en_r0  <= 1'b0; wrt_Ez_n_en_r0  <= 1'b1;
-				calc_Hy_en   <= 1'b0; calc_Ez_en   <= 1'b1;
-				calc_src_en  <= 1'b0;
+                                calc_Hy_en      <= 1'b0; calc_Ez_en      <= 1'b1;
+				calc_src_en     <= 1'b0;
 			end
 
 		WAIT_EZ_END:begin
 				wrt_Hy_n_en_r0  <= 1'b0; wrt_Ez_n_en_r0  <= 1'b0;
-				calc_Hy_en   <= 1'b0; calc_Ez_en   <= 1'b1;
-				calc_src_en  <= 1'b0;
+                                calc_Hy_en      <= 1'b0; calc_Ez_en      <= 1'b1;
+				calc_src_en     <= 1'b0;
 			end
 
 		LOAD_SRC:begin
 				wrt_Hy_n_en_r0  <= 1'b0; wrt_Ez_n_en_r0  <= 1'b0;
-				calc_Hy_en   <= 1'b0; calc_Ez_en   <= 1'b0;
-				calc_src_en  <= 1'b1;
+                                calc_Hy_en      <= 1'b0; calc_Ez_en      <= 1'b0;
+				calc_src_en     <= 1'b1;
 			end
 
 		WAIT_SRC_END:begin
 				wrt_Hy_n_en_r0  <= 1'b0; wrt_Ez_n_en_r0  <= 1'b0;
-				calc_Hy_en   <= 1'b0; calc_Ez_en   <= 1'b0;
-				calc_src_en  <= 1'b1;
+                                calc_Hy_en      <= 1'b0; calc_Ez_en      <= 1'b0;
+				calc_src_en     <= 1'b1;
 			end
 
 		default:begin
 				wrt_Hy_n_en_r0  <= 1'b0; wrt_Ez_n_en_r0  <= 1'b0;
-				calc_Hy_en   <= 1'b0; calc_Ez_en   <= 1'b0;
-				calc_src_en  <= 1'b0;
+                                calc_Hy_en      <= 1'b0; calc_Ez_en      <= 1'b0;
+				calc_src_en     <= 1'b0;
 			end
 
 		endcase

@@ -344,7 +344,7 @@ module fdtd_mem_ctrl
 	    begin
                 s_w_req = 1'b1;
 		wt_Hy_sgl = 1'b1;
-		    if (r_word_size == 'b0)begin
+		    if (r_word_size == 'd0)begin
 			mem_rd_end_o = 1'b1;
                         s_CS_n = WAIT_0;
 		    end
@@ -378,7 +378,7 @@ module fdtd_mem_ctrl
 	    begin
                 s_w_req = 1'b1;
 		wt_Ez_sgl = 1'b1;
-		if (r_word_size == 'b0)begin
+		if (r_word_size == 'd0)begin
 			mem_rd_end_o   = 1'b1;
                         s_CS_n = WAIT_1;
 		end
