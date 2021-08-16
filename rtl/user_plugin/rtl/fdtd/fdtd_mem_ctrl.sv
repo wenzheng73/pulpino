@@ -108,7 +108,8 @@ module fdtd_mem_ctrl
     logic			           wt_Hy_sgl;
     logic			           wt_Ez_sgl;
     logic			           wt_src_sgl;
-    logic			           buffer_Hy_last;
+    logic			           buffer_Hy_last_0;
+    logic			           buffer_Hy_last_1;
     logic			           buffer_Ez_last_0;
     logic			           buffer_Ez_last_1;
     logic			           nxt_buffer_en;
@@ -160,8 +161,10 @@ module fdtd_mem_ctrl
     assign Hy_old_o          = rd_Hy_sgl ? s_r_data : 'd0;
     assign Ez_old_o          = (rd_Ez_sgl||rd_src_sgl) ? s_r_data : 'd0;
     //
-    assign buffer_Hy_last    = ((record_num_cnt == BUFFER_SIZE)
-    				&&rd_Hy_sgl)? 1'b1:1'b0;
+    assign buffer_Hy_last_0  = calc_Hy_start_en_i ? ((record_num_cnt == BUFFER_SIZE)
+    				&&rd_Hy_sgl) : 1'b0;
+    assign buffer_Hy_last_1  = calc_Ez_start_en_i ? ((record_num_cnt == BUFFER_SIZE+1'b1)
+    				&&rd_Hy_sgl) : 1'b0;
     assign buffer_Ez_last_0  = calc_Hy_start_en_i ? ((record_num_cnt == BUFFER_SIZE+1'b1)
     				&&rd_Ez_sgl) : 1'b0; 
     assign buffer_Ez_last_1  = calc_Ez_start_en_i ? ((record_num_cnt == BUFFER_SIZE)
@@ -253,7 +256,7 @@ module fdtd_mem_ctrl
 		/*if (~s_r_gnt)begin
                     s_CS_n = WAIT_READ_HY;
 		end*/
-	    	if (buffer_Hy_last)begin
+	    	if (buffer_Hy_last_0||buffer_Hy_last_1)begin
 	    	    buffer_Hy_end_o   = 1'b1;
                     s_r_req           = 1'b0;
 		    s_CS_n            = INIT_READ_EZ;
@@ -545,7 +548,9 @@ always_ff @(posedge ACLK, negedge ARESETn)
 		end
 
 		WAIT_READ_HY:
-		begin
+		begin   if (buffer_Hy_last_1)
+			    r_r_Hy_word_addr <= r_r_Hy_word_addr -1'b1;
+			else 
 			r_r_Hy_word_addr <= (mstr.ar_valid && mstr.ar_ready)? (r_r_Hy_word_addr + 1'b1) : r_r_Hy_word_addr; 
 		end
 

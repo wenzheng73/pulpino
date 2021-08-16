@@ -9,10 +9,9 @@
 
 module fdtd_acc
 #(
-	parameter	FDTD_DATA_WIDTH 	= 32,
-	parameter 	BUFFER_ADDR_WIDTH	= 6,
-	parameter	REG_SIZE_WIDTH          = 16
-	
+	parameter	FDTD_DATA_WIDTH 	= 32 ,
+	parameter 	BUFFER_ADDR_WIDTH	= 6  ,	
+	parameter 	BUFFER_SIZE       	= 50	
 )
 (
 	input 			        	        CLK,
@@ -82,8 +81,7 @@ logic  [FDTD_DATA_WIDTH-1:0]	Ez_n;
 //
     fdtd_buffer 
     	#(     	.FDTD_DATA_WIDTH	( FDTD_DATA_WIDTH   ),
-	       	.BUFFER_ADDR_WIDTH 	( BUFFER_ADDR_WIDTH ),
-		.REG_SIZE_WIDTH  	( REG_SIZE_WIDTH    )
+	       	.BUFFER_ADDR_WIDTH 	( BUFFER_ADDR_WIDTH )
 	)
 	ram_buffer_inst
 	(
@@ -131,9 +129,10 @@ logic  [FDTD_DATA_WIDTH-1:0]	Ez_n;
 //------------control calc process-----------//
     fdtd_calc_ctrl
     	#(
-		.BUFFER_ADDR_WIDTH	(BUFFER_ADDR_WIDTH),
-		.FDTD_DATA_WIDTH	(FDTD_DATA_WIDTH)
-    	)
+		.BUFFER_ADDR_WIDTH	( BUFFER_ADDR_WIDTH ),
+		.FDTD_DATA_WIDTH	( FDTD_DATA_WIDTH   ),
+		.BUFFER_SIZE	        ( BUFFER_SIZE       )
+    	) 
 	fdtd_calc_ctrl_inst(
 		.CLK			( CLK		    ),
 		.RST_N			( RST_N		    ), 

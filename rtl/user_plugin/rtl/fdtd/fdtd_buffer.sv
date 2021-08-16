@@ -8,8 +8,6 @@
 module fdtd_buffer 
 #(	parameter 	FDTD_DATA_WIDTH 	= 32,
 	parameter	BUFFER_ADDR_WIDTH     	= 6,
-	parameter	BUFFER_RAM_DEPTH	= 64,
-	parameter	REG_SIZE_WIDTH		= 16,
 	parameter	FDTD_BUFFER_DEPTH       = 64
 	)
 (

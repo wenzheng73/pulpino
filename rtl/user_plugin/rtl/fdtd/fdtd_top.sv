@@ -1,6 +1,7 @@
-`define REG_SIZE_WIDTH  15  // At most 32KB
-`define FDTD_DATA_WIDTH 32
-
+`define REG_SIZE_WIDTH    15  // At most 32KB
+`define FDTD_DATA_WIDTH   32
+`define BUFFER_ADDR_WIDTH 6
+`define BUFFER_SIZE       50
 
 module fdtd_top
 (
@@ -186,7 +187,8 @@ module fdtd_top
     fdtd_acc 
     #(
     	.FDTD_DATA_WIDTH  ( `FDTD_DATA_WIDTH  	),
-        .REG_SIZE_WIDTH   ( `REG_SIZE_WIDTH     )	
+	.BUFFER_SIZE      ( `BUFFER_SIZE        ),
+        .BUFFER_ADDR_WIDTH( `BUFFER_ADDR_WIDTH  )
     )
     fdtd_acc_i
     (
@@ -232,6 +234,5 @@ module fdtd_top
 	.Hy_n_o			( Hy_n   		),
 	.Ez_n_o			( Ez_n 		        )	
     );
-	
 //
 endmodule

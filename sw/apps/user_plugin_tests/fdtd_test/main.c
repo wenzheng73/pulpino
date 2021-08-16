@@ -6,7 +6,7 @@
 #define IRQ_IDX 		22
 
 //FDTD PARAMETER
-#define NUMBER_OF_TIME_STEPS 	50
+#define NUMBER_OF_TIME_STEPS 	60
 #define GRID_SIZE	        100
 #define SOURCE_POSITION	        50
 #define UNUSED_SIZE             50 
@@ -78,11 +78,14 @@ void run_fdtd_loop(int number_of_time_steps){
 	printf("Having fdtd loop!!!\n");
 	for (i=0;i<number_of_time_steps;i++){
 		//
-		printf("-----current's timestep is %d .-----\n",i+1);
+		printf("---------The current timestep is %d .---------\n",i+1);
+
                 //load field source
+		//The coefficients here are related to the actual project
+		//The simplest way to join the field_source (point source) is implemented here
 	        load_field_source(i);
 
-	        //trigger calculation
+	        //trigger calculation of updating field_value
 	 	FDTD_START_CALC_SIGNAL = FDTD_CALC_TRIGGER_BIT;
 
 		//updating electromagnetic field
@@ -250,10 +253,39 @@ void load_field_source(int current_timestep){
 			FDTD_SOURCE  =  0x00020261;
 			break;
                 case 49: 
-			FDTD_SOURCE  =  0x0005FF07;
+			FDTD_SOURCE  =  0x00000000;
 			break;
-	}
-	
+                case 50: 
+			FDTD_SOURCE  =  0xFFFDFD9F;
+			break;
+                case 51: 
+			FDTD_SOURCE  =  0xFFFBFD45;
+			break;
+                case 52: 
+			FDTD_SOURCE  =  0xFFFA00F9;
+			break;
+                case 53: 
+			FDTD_SOURCE  =  0xFFF80ABC;
+			break;
+                case 54: 
+			FDTD_SOURCE  =  0xFFF61C88;
+			break;
+                case 55: 
+			FDTD_SOURCE  =  0xFFF43853;
+			break;
+                case 56: 
+			FDTD_SOURCE  =  0xFFF26004;
+			break;
+                case 57: 
+			FDTD_SOURCE  =  0xFFF09579;
+			break;
+	        case 58: 
+			FDTD_SOURCE  =  0xFFEEDA82;
+			break;
+                case 59: 
+			FDTD_SOURCE  =  0xFFED30DD;
+			break;
+	}	
 }
 
 void update_field_process(){
@@ -278,7 +310,8 @@ void update_Hy_process(int src_position){
 			break;
 		}
 	}
-	printf("this position's Hy field_value is: Hy[%d] = %d .\n",src_position, Hy[src_position]);
+	printf("this position's Hy field_value is: Hy[%d] = %d , Hy[%d] = %d, Hy[%d] = %d, Hy[%d] = %d .\n",
+		        0,Hy[0],src_position-1, Hy[src_position-1],src_position, Hy[src_position],GRID_SIZE-1,Hy[GRID_SIZE-1]);
 	CALC_HY_SGL = FDTD_CALC_CLR_BIT;
 }
 void update_Ez_process(int src_position){
@@ -292,7 +325,8 @@ void update_Ez_process(int src_position){
 			break;
 		}	
 	}
-	printf("this position's Ez field_value is: Ez[%d] = %d .\n",src_position, Ez[src_position]);
+	printf("this position's Ez field_value is: Ez[%d] = %d , Ez[%d] = %d , Ez[%d] = %d .\n",
+			0,Ez[0],src_position, Ez[src_position],GRID_SIZE-1,Ez[GRID_SIZE-1]);
 	CALC_EZ_SGL = FDTD_CALC_CLR_BIT;
 }
 

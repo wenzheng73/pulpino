@@ -10,7 +10,7 @@ module fdtd_data_delay
 	output logic [FDTD_DATA_WIDTH-1:0]	data_o
 );
 //
-logic [FDTD_DATA_WIDTH-1:0] temp_r0;
+/*logic [FDTD_DATA_WIDTH-1:0] temp_r0;
 logic [FDTD_DATA_WIDTH-1:0] temp_r1;
 logic [2:0]   		    buffer_stage;
 //
@@ -33,7 +33,34 @@ always @(posedge CLK or negedge RST_N)begin
 	endcase
 end
 //
-assign data_o = temp_r1;
+assign data_o = temp_r1;*/
+//
+logic [DELAY_STAGE-1:0] delay_stage;
+logic [FDTD_DATA_WIDTH-1:0] delay_ram [DELAY_STAGE-1:0];
+//
+assign delay_stage = DELAY_STAGE;
+//
+integer i;
+//
+always_ff @(posedge CLK ,negedge RST_N)begin
+	if(!RST_N)begin
+            for (i=0;i<DELAY_STAGE;i=i+1)begin
+		    delay_ram[i] <= 'd0;
+	
+	    end
+	end
+	else if (delay_stage <= 1)begin
+            delay_ram[delay_stage - 1] <= data_i;
+        end
+	else begin  
+            for (i=0; i<DELAY_STAGE; i=i+1)begin
+                delay_ram[i] <= data_i;
+		delay_ram[i+1]<= delay_ram[i];
+	    end
+	end
+    end
+//
+assign data_o = delay_ram[DELAY_STAGE-1];
 //
 endmodule
 	

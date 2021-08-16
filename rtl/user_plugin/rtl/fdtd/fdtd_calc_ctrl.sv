@@ -56,6 +56,7 @@ logic 				calc_src_en;
 logic 				calc_Hy_end_flg;
 logic 				calc_Ez_end_flg;
 logic 				rd_Hy_old_en;
+logic 				rd_Hy_old_en_r;
 logic 				rd_Ez_old_en;
 logic 				rd_Ez_old_en_r;
 logic 				wrt_Hy_n_en;
@@ -81,8 +82,8 @@ assign  rd_Ez_old_addr_o = rd_Ez_old_addr ;
 assign  wrt_Hy_n_addr_o  = wrt_Hy_n_addr  ;
 assign  wrt_Ez_n_addr_o  = wrt_Ez_n_addr  ; 
 //
-assign  rd_Hy_old_en_o   = rd_Hy_old_en   ;   
-assign  rd_Ez_old_en_o   = rd_Ez_old_en || rd_Ez_old_en_r  ;
+assign  rd_Hy_old_en_o   = (CS_CALC == CALC_HY) ? rd_Hy_old_en_r : (rd_Hy_old_en || rd_Hy_old_en_r)  ;   
+assign  rd_Ez_old_en_o   = (CS_CALC == CALC_EZ) ? rd_Ez_old_en_r : (rd_Ez_old_en || rd_Ez_old_en_r ) ;
 assign  wrt_Hy_n_en_o    = wrt_Hy_n_en ;
 assign  wrt_Ez_n_en_o    = (CS_CALC == WAIT_SRC_END) ? 1'b1 : wrt_Ez_n_en ;
 //
@@ -289,10 +290,15 @@ always_comb
 always_ff @(posedge CLK ,negedge RST_N)begin
 	if (!RST_N)
           rd_Ez_old_en_r <= 1'b0;
-	else if (CS_CALC == CALC_HY || CS_CALC == WAIT_HY_END)
+        else 
 	  rd_Ez_old_en_r <= rd_Ez_old_en;
-	else
-	  rd_Ez_old_en_r <= 1'b0;
+end
+//
+always_ff @(posedge CLK ,negedge RST_N)begin
+	if (!RST_N)
+          rd_Hy_old_en_r <= 1'b0;
+	else  
+	  rd_Hy_old_en_r <= rd_Hy_old_en;
 end
 //
 //--------generate driving signal of mem_ctrl module--------//
@@ -398,72 +404,60 @@ always_ff @(posedge CLK, negedge RST_N)
 	                wrt_Ez_n_en    <= wrt_Ez_n_en_r3;
 		end
 	end
-//--------generate read/write address of RAM--------------//
+//--------generate Hy's reading address of RAM--------------//
+logic [BUFFER_ADDR_WIDTH-1:0] rd_Hy_old_addr_r0;
+
 always_ff @(posedge CLK, negedge RST_N)	
 	begin
 		if (!RST_N)begin
-            		rd_Hy_old_addr <= 'd0;	
-            	 	rd_Ez_old_addr <= 'd0;		
+            		rd_Hy_old_addr <= 'd0;
+                        rd_Hy_old_addr_r0 <= 'd0;
 		end
 		else if (CS_CALC == IDLE)begin
-			rd_Hy_old_addr <= 'd0;
-			rd_Ez_old_addr <= 'd0;
+                        rd_Hy_old_addr <= 'd0;
+                        rd_Hy_old_addr_r0 <= 'd0;
+	        end
+		else if (CS_CALC == CALC_HY)begin
+			rd_Hy_old_addr_r0 <= rd_Hy_old_addr_r0 + 1'b1;
+                        rd_Hy_old_addr <= rd_Hy_old_addr_r0;
 		end
-		else if (CS_CALC == CALC_HY || CS_CALC == CALC_EZ)begin
+                else if (CS_CALC == CALC_EZ)begin
 			rd_Hy_old_addr <= rd_Hy_old_addr + 1'b1;
+                end
+		else begin
+			rd_Hy_old_addr <= 'd0;
+			rd_Hy_old_addr_r0 <= 'd0;
+		end
+
+	end
+//--------generate Ez's reading address of RAM--------------//
+logic [BUFFER_ADDR_WIDTH-1:0] rd_Ez_old_addr_r0;
+
+always_ff @(posedge CLK, negedge RST_N)	
+	begin
+		if (!RST_N)begin
+            	 	rd_Ez_old_addr <= 'd0;	
+                        rd_Ez_old_addr_r0 <= 'd0;
+		end
+                else if (CS_CALC == IDLE)begin
+	            	rd_Ez_old_addr <= 'd0;	
+                        rd_Ez_old_addr_r0 <= 'd0;        
+		end
+                else if (CS_CALC == CALC_HY)begin
 			rd_Ez_old_addr <= rd_Ez_old_addr + 1'b1;
+		end
+		else if (CS_CALC == CALC_EZ)begin
+			rd_Ez_old_addr_r0 <= rd_Ez_old_addr_r0 + 1'b1;
+			rd_Ez_old_addr <= rd_Ez_old_addr_r0;
 		end
 		else if (CS_CALC == LOAD_SRC)
 			rd_Ez_old_addr <= 'd0;
 		else begin
-			rd_Hy_old_addr <= 'd0;
 			rd_Ez_old_addr <= 'd0;
-		end
-
-	end
-//delay Hy's address of writing
-logic [BUFFER_ADDR_WIDTH-1:0]	wrt_Hy_n_addr_r0;
-logic [BUFFER_ADDR_WIDTH-1:0]	wrt_Hy_n_addr_r1;
-//delay Ez's address of writing
-logic [BUFFER_ADDR_WIDTH-1:0]	wrt_Ez_n_addr_r0;
-logic [BUFFER_ADDR_WIDTH-1:0]	wrt_Ez_n_addr_r1;
-//
-/*always_ff @(posedge CLK, negedge RST_N )
-	begin
-		if (!RST_N)begin
-			wrt_Hy_n_addr <= 'd0;
-			wrt_Hy_n_addr_r0 <= 'd0;
-			wrt_Hy_n_addr_r1 <= 'd0;
-		end
-		else if (CS_CALC == CALC_HY || CS_CALC == WAIT_HY_END)begin
-			wrt_Hy_n_addr_r0 <= rd_Hy_old_addr;
-			wrt_Hy_n_addr_r1 <= wrt_Hy_n_addr_r0;
-			wrt_Hy_n_addr <= wrt_Hy_n_addr_r1;
-		end
-		else begin
-			wrt_Hy_n_addr <= 'd0;
+			rd_Ez_old_addr_r0 <= 'd0;
 		end
 	end
-//
-always_ff @(posedge CLK, negedge RST_N )
-	begin
-		if (!RST_N)begin
-			wrt_Ez_n_addr <= 'd0;
-			wrt_Ez_n_addr_r0 <= 'd0;
-			wrt_Ez_n_addr_r1 <= 'd0;
-		end
-		else if (CS_CALC == CALC_EZ || CS_CALC == WAIT_EZ_END)begin
-			wrt_Ez_n_addr_r0 <= rd_Ez_old_addr;
-			wrt_Ez_n_addr_r1 <= wrt_Ez_n_addr_r0;
-			wrt_Ez_n_addr <= wrt_Ez_n_addr_r1;
-		end
-		else if (CS_CALC == WAIT_SRC_END)
-			wrt_Ez_n_addr <= 'd0;
-		else begin
-			wrt_Ez_n_addr <= 'd0;	
-		end
-	end*/
-//
+//---------------delay address of writing-------------------//-------
 always_ff @(posedge CLK, negedge RST_N )
 	begin
 		if (!RST_N)begin
@@ -473,7 +467,6 @@ always_ff @(posedge CLK, negedge RST_N )
 			wrt_Hy_n_addr <= wrt_Hy_n_en ? (wrt_Hy_n_addr + 1'b1) : 1'b0;	
 		end
 	end
-
 //
 always_ff @(posedge CLK, negedge RST_N )
 	begin
