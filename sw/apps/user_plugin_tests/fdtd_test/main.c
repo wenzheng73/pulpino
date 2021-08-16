@@ -2,6 +2,10 @@
 #include "int.h"
 #include "event.h"
 #include "user_plugin/fdtd/fdtd.h"
+#include "user_plugin/fdtd/field_source.h"
+#include "user_plugin/fdtd/coefficients.h"
+#include "user_plugin/fdtd/observation_point.h"
+
 
 #define IRQ_IDX 		22
 
@@ -86,14 +90,14 @@ void run_fdtd_loop(int number_of_time_steps){
 	        load_field_source(i);
 
 	        //trigger calculation of updating field_value
-	 	FDTD_START_CALC_SIGNAL = FDTD_CALC_TRIGGER_BIT;
+	 	FDTD_START_CALC_SGL = FDTD_CALC_TRIGGER_BIT;
 
 		//updating electromagnetic field
 		//Set to PEC at the truncation boundary
 		//load field_source, such as sin function
 		update_field_process();
 		//
-		FDTD_START_CALC_SIGNAL = FDTD_CALC_CLR_BIT;
+		FDTD_START_CALC_SGL = FDTD_CALC_CLR_BIT;
 		printf("Complete a timestep's updating...<_>\n");
                 
 	}
@@ -105,7 +109,7 @@ void load_field_source(int current_timestep){
 	//
 	printf("load field source data!!!\n");
 	//
-	//int src_data{
+	//int src_data[]{
 	    
 	//}
 	switch (current_timestep){
@@ -185,7 +189,7 @@ void update_Hy_process(int src_position){
         //
 	CALC_HY_SGL = FDTD_CALC_TRIGGER_BIT;
 	while(1){
-	        //int calc_Hy_status = FDTD_CALC_STATUS;
+	        //
 	        int calc_Hy_status = CALC_HY_SGL;
 		printf("calc_Hy_status:%d. <_>\n",calc_Hy_status);
 		if(calc_Hy_status){
@@ -249,9 +253,9 @@ void compare_observation_point_error(){
 
 int main() {
     int errors = 0; 
-    fdtd_solve(GRID_SIZE,NUMBER_OF_TIME_STEPS);
-    //check_wo_irq(&errors);
-    //check_w_irq(&errors);
+    for (size_t i;i<3;i++){ 
+        fdtd_solve(GRID_SIZE,NUMBER_OF_TIME_STEPS);
+    }
 
     printf("ERRORS: %d\n", errors);
 

@@ -5,41 +5,35 @@
 
 `define WORD_ADDR_WIDTH 8
 
-`define REG_CEZE         8'h00   // BASEADDR + 0x00
-`define REG_CEZHY        8'h01   // BASEADDR + 0x04
-`define REG_CEZJ         8'h02   // BASEADDR + 0x08
-`define REG_CHYH         8'h03   // BASEADDR + 0x0C
-`define REG_CHYEZ        8'h04   // BASEADDR + 0x10
-`define REG_CHYM         8'h05   // BASEADDR + 0x14
-`define REG_COE0         8'h06   // BASEADDR + 0x18
-`define REG_SOURCE       8'h07   // BASEADDR + 0x1C
-`define REG_SAMPLE       8'h08   // BASEADDR + 0x20
+`define REG_CEZE              8'h00   // BASEADDR + 0x00
+`define REG_CEZHY             8'h01   // BASEADDR + 0x04
+`define REG_CEZJ              8'h02   // BASEADDR + 0x08
+`define REG_CHYH              8'h03   // BASEADDR + 0x0C
+`define REG_CHYEZ             8'h04   // BASEADDR + 0x10
+`define REG_CHYM              8'h05   // BASEADDR + 0x14
+`define REG_COE0              8'h06   // BASEADDR + 0x18
+`define REG_SOURCE            8'h07   // BASEADDR + 0x1C
 
-`define REG_SIZE              8'h09   // BASEADDR + 0x24
-`define REG_CTRL              8'h0A   // BASEADDR + 0x28
-`define REG_CMD               8'h0B   // BASEADDR + 0x2C
-`define REG_STATUS            8'h0C   // BASEADDR + 0x30
-`define REG_START_CALC_SIGNAL 8'h0D   // BASEADDR + 0x34
+`define REG_SIZE              8'h08   // BASEADDR + 0x24
+`define REG_CTRL              8'h09   // BASEADDR + 0x28
+`define REG_CMD               8'h0A   // BASEADDR + 0x2C
+`define REG_STATUS            8'h0B   // BASEADDR + 0x30
+`define REG_START_CALC_SGL    8'h0C   // BASEADDR + 0x34
 
-`define REG_HY_ADDR           8'h0E   // BASEADDR + 0x38
-`define REG_EZ_ADDR           8'h0F   // BASEADDR + 0x3C
-`define REG_BUFFER_SIZE       8'h10   // BASEADDR + 0x40
-`define REG_BUFFER_STATUS     8'h11   // BASEADDR + 0x44
-`define REG_CALC_HY_SGL       8'h12   // BASEADDR + 0x48
-`define REG_CALC_EZ_SGL       8'h13   // BASEADDR + 0x4C
-`define REG_CALC_SRC_SGL      8'h14   // BASEADDR + 0x50
-`define REG_UPDATE_END_SGL    8'h15   // BASEADDR + 0x54
-`define REG_CALC_STATUS       8'h16   // BASEADDR + 0x58
+`define REG_HY_ADDR           8'h0D   // BASEADDR + 0x38
+`define REG_EZ_ADDR           8'h0E   // BASEADDR + 0x3C
+`define REG_CALC_HY_SGL       8'h0F   // BASEADDR + 0x48
+`define REG_CALC_EZ_SGL       8'h10   // BASEADDR + 0x4C
+`define REG_CALC_SRC_SGL      8'h11   // BASEADDR + 0x50
 
 
-`define CTRL_INT_EN_BIT 'd0
+`define CTRL_INT_EN_BIT        'd0
 
-`define REG_CMD_WIDTH   2
-`define CMD_CLR_INT_BIT 'd0
-`define CMD_TRIGGER_BIT 'd1
+`define REG_CMD_WIDTH            2
+`define CMD_CLR_INT_BIT        'd0
+`define CMD_TRIGGER_BIT        'd1
 
-`define FDTD_CALC_SIGNAL_BIT 'd1
-`define FIELD_UPDATE_END_SGL_BIT 'd1
+`define FDTD_CALC_SIGNAL_BIT   'd1
 
 `define STATUS_BUSY_BIT        'd0
 `define STATUS_INT_PENDING_BIT 'd1
@@ -249,7 +243,7 @@ module fdtd_reg_ctrl
                          for (int i = 0; i < slv.AXI_STRB_WIDTH; i++)
                              if (s_wstrb[i])
                                  Jz[(i * 8) +: 8] <= s_wdata[(i * 8) +: 8];
-		     `REG_START_CALC_SIGNAL:
+		     `REG_START_CALC_SGL:
                          if (s_wstrb[`FDTD_CALC_SIGNAL_BIT / 8])
                              fdtd_start_signal_o <= s_wdata[`FDTD_CALC_SIGNAL_BIT];
                      `REG_SIZE:
@@ -275,15 +269,7 @@ module fdtd_reg_ctrl
                              calc_Ez_start_en_o <= s_wdata[`FDTD_CALC_SIGNAL_BIT];
 		     `REG_CALC_SRC_SGL:
                          if (s_wstrb[`FDTD_CALC_SIGNAL_BIT / 8])
-                             calc_src_start_en_o <= s_wdata[`FDTD_CALC_SIGNAL_BIT];
-	             `REG_BUFFER_SIZE:
-                         for (int i = 0; i < $size(buffer_size_o); i++)
-                             if (s_wstrb[i / 8])
-                                 buffer_size_o[i] <= s_wdata[i];
-	             `REG_UPDATE_END_SGL:
-			 if (s_wstrb[`FIELD_UPDATE_END_SGL_BIT / 8])
-                             field_update_end_o <= s_wdata[`FIELD_UPDATE_END_SGL_BIT];
-
+                             calc_src_start_en_o <= s_wdata[`FDTD_CALC_SIGNAL_BIT];     
                  endcase
              end
     end
@@ -347,18 +333,12 @@ module fdtd_reg_ctrl
     always_comb
     begin
         case (s_r_word_addr)
-	    `REG_BUFFER_STATUS:
-		s_rdata = {'h0,buffer_end_i};
        	    `REG_CALC_HY_SGL:
 		s_rdata = {'h0,!calc_Hy_end_flg_i};
 	    `REG_CALC_EZ_SGL:
 		s_rdata = {'h0,!calc_Ez_end_flg_i};
 	    `REG_CALC_SRC_SGL:
 		s_rdata = {'h0,!calc_src_end_flg_i};
-		 // `REG_CALC_STATUS:
-		//s_rdata = {'h0,calc_Hy_end_flg_i};
-	    `REG_SAMPLE:
-		s_rdata = sample_point;
             `REG_SIZE:
                 // SystemVerilog will resize to the correct size
                 s_rdata = {'h0, size_o};
