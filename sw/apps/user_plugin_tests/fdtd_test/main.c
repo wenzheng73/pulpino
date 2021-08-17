@@ -2,15 +2,15 @@
 #include "int.h"
 #include "event.h"
 #include "user_plugin/fdtd/fdtd.h"
-#include "user_plugin/fdtd/field_source.h"
+/*#include "user_plugin/fdtd/field_source.h"
 #include "user_plugin/fdtd/coefficients.h"
-#include "user_plugin/fdtd/observation_point.h"
+#include "user_plugin/fdtd/observation_point.h"*/
 
 
 #define IRQ_IDX 		22
 
 //FDTD PARAMETER
-#define NUMBER_OF_TIME_STEPS    60	
+#define NUMBER_OF_TIME_STEPS    5	
 #define GRID_SIZE	        100
 #define SOURCE_POSITION	        40
 #define UNUSED_SIZE             50 
@@ -78,7 +78,7 @@ void read_coefficient(){
 
 void run_fdtd_loop(int number_of_time_steps){
 	int i,j;
-	FDTD_START_CALC_SIGNAL = FDTD_CALC_CLR_BIT;
+	FDTD_START_CALC_SGL = FDTD_CALC_CLR_BIT;
 	printf("Having fdtd loop!!!\n");
 	for (i=0;i<number_of_time_steps;i++){
 		//Start the entire iterative process
@@ -198,15 +198,15 @@ void update_Hy_process(int src_position){
 		    break;
 		}
 	}
-	printf("this position's Hy field_value is: Hy[%d] = %d, Hy[%d] = %d, Hy[%d] = %d, Hy[%d] = %d, Hy[%d] = %d .\n",
-		        0,Hy[0],
+	printf("this position's Hy field_value is: Hy[%d] = %d, Hy[%d] = %d, Hy[%d] = %d, Hy[%d] = %d .\n",
+			0,Hy[0],
 			src_position-1, Hy[src_position-1],
 			src_position, Hy[src_position],
-			GRID_SIZE-1,Hy[GRID_SIZE-1],
-			GRID_SIZE,Hy[GRID_SIZE]
+			GRID_SIZE-1,Ez[GRID_SIZE-1]
 			);
 	CALC_HY_SGL = FDTD_CALC_CLR_BIT;
 }
+
 void update_Ez_process(int src_position){
 	CALC_EZ_SGL = FDTD_CALC_TRIGGER_BIT;
 	while(1){
@@ -218,11 +218,10 @@ void update_Ez_process(int src_position){
 		    break;
 		}	
 	}
-	printf("this position's Ez field_value is: Ez[%d] = %d, Ez[%d] = %d, Ez[%d] = %d, Ez[%d] = %d, Ez[%d] = %d, Ez[%d] = %d .\n",
-	                0,Ez[0],
+	printf("this position's Ez field_value is: Ez[%d] = %d, Ez[%d] = %d, Ez[%d] = %d, Ez[%d] = %d, Ez[%d] = %d .\n",
 			1,Ez[1],
-			src_position, Ez[src_position],
-			src_position+11,Ez[src_position+11],
+        		src_position, Ez[src_position],
+			src_position+11,Ez[src_position+11],			
 			GRID_SIZE-1,Ez[GRID_SIZE-1],
 			GRID_SIZE,Ez[GRID_SIZE]
 			);
@@ -253,10 +252,7 @@ void compare_observation_point_error(){
 
 int main() {
     int errors = 0; 
-    for (size_t i;i<3;i++){ 
-        fdtd_solve(GRID_SIZE,NUMBER_OF_TIME_STEPS);
-    }
-
+    fdtd_solve(GRID_SIZE,NUMBER_OF_TIME_STEPS);
     printf("ERRORS: %d\n", errors);
 
     return !(errors == 0);

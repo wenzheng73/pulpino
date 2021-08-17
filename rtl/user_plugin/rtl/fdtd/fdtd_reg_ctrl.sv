@@ -58,11 +58,10 @@ module fdtd_reg_ctrl
     output logic signed [slv.AXI_DATA_WIDTH - 1:0]  chyez   ,
     output logic signed [slv.AXI_DATA_WIDTH - 1:0]  coe0   ,
     output logic signed [slv.AXI_DATA_WIDTH - 1:0]  Jz   ,
-    //buffer end signal
-    input  logic 			     buffer_end_i,
+
     //start fdtd calc signal
     output logic                             fdtd_start_signal_o,
-    output logic                             field_update_end_o,
+
     output logic 			     calc_Hy_start_en_o,
     output logic 			     calc_Ez_start_en_o,
     output logic 			     calc_src_start_en_o,
@@ -73,9 +72,7 @@ module fdtd_reg_ctrl
     //field value addr
     output logic [slv.AXI_ADDR_WIDTH - 1:0]  Hy_addr_o,
     output logic [slv.AXI_ADDR_WIDTH - 1:0]  Ez_addr_o,
-    output logic [slv.AXI_ADDR_WIDTH - 1:0]  buffer_size_o,
-    //observation point data per timestep
-    input  logic [slv.AXI_DATA_WIDTH - 1:0]  sample_point, 
+
     //user logic
     //
     output logic [REG_SIZE_WIDTH - 1:0]      size_o       ,        // process byte number
@@ -203,14 +200,13 @@ module fdtd_reg_ctrl
             ctrl_int_en_o <= 'b0;
 
 	    fdtd_start_signal_o <= 'b0;
-            field_update_end_o  <= 'b0;
             calc_Hy_start_en_o <= 'b0;
             calc_Ez_start_en_o <= 'b0;
             calc_src_start_en_o <= 'b0;
 
 	    Hy_addr_o <= 'b0; 
 	    Ez_addr_o <= 'b0; 
-	    buffer_size_o <= 'b0; 
+
         end
         else if (s_write)
              begin

@@ -8,8 +8,7 @@
 
 module fdtd_ram 
 #(	parameter 	FDTD_DATA_WIDTH	 = 32,
-	parameter	BUFFER_ADDR_WIDTH= 6,
-	parameter	BUFFER_RAM_DEPTH = 64
+	parameter	BUFFER_ADDR_WIDTH= 6
 )
 (
 	input					CLK,		
@@ -25,14 +24,15 @@ module fdtd_ram
 	output  logic [FDTD_DATA_WIDTH-1:0]	dout
 );
 //
-logic	[FDTD_DATA_WIDTH-1:0] ram [0:BUFFER_RAM_DEPTH-1];
+localparam RAM_DEPTH = 2**BUFFER_ADDR_WIDTH;
+logic	[FDTD_DATA_WIDTH-1:0] ram [0:RAM_DEPTH-1];
 //
 integer i;
 //write data
 always_ff @(posedge CLK or negedge RST_N)
 	begin
 		if (!RST_N)begin
-		for(i=0;i<BUFFER_RAM_DEPTH;i=i+1)
+		for(i=0;i<RAM_DEPTH;i=i+1)
 			ram[i] <= 'd0;
 		end
 		else if (en && wren)

@@ -21,9 +21,8 @@ module fdtd_top
     logic signed [mstr.AXI_DATA_WIDTH - 1: 0] chyez;
     logic signed [mstr.AXI_DATA_WIDTH - 1: 0] coe0;
     logic signed [mstr.AXI_DATA_WIDTH - 1: 0] Jz;
-    logic signed [mstr.AXI_DATA_WIDTH - 1: 0] sample_point;
+
     logic			              fdtd_start_signal;
-    logic			              field_update_end;
     //field_value address
     logic signed [mstr.AXI_ADDR_WIDTH - 1: 0] Hy_addr;
     logic signed [mstr.AXI_ADDR_WIDTH - 1: 0] Ez_addr;
@@ -31,7 +30,6 @@ module fdtd_top
     logic			       buffer_Hy_end;
     logic			       buffer_Ez_end;
     logic			       buffer_src_end;
-    logic			       buffer_end;
     //data valid signal
     logic			       rdvalid_Hy;
     logic			       rdvalid_Ez;
@@ -64,8 +62,6 @@ module fdtd_top
     logic [mstr.AXI_DATA_WIDTH - 1: 0] Ez_old;
     logic [mstr.AXI_DATA_WIDTH - 1: 0] Hy_n;
     logic [mstr.AXI_DATA_WIDTH - 1: 0] Ez_n;
-    //ram_buffer size
-    logic [mstr.AXI_DATA_WIDTH - 1: 0] buffer_size;
     //
     logic [`REG_SIZE_WIDTH - 1: 0]     s_size;
     logic                              s_ctrl_int_en;
@@ -94,14 +90,9 @@ module fdtd_top
         .Jz		      ( Jz                   ),
 	//calculation signal
         .fdtd_start_signal_o  ( fdtd_start_signal    ),
-	.field_update_end_o   ( field_update_end     ),
-        .sample_point         ( sample_point         ),
 	//read/write address
 	.Hy_addr_o	      ( Hy_addr		     ),
 	.Ez_addr_o	      ( Ez_addr		     ),
-	//buffer data
-	.buffer_end_i	      ( buffer_end           ),
-	.buffer_size_o	      ( buffer_size	     ),
 	//calculation flag
 	.calc_Hy_start_en_o   ( calc_Hy_start_en     ),
 	.calc_Ez_start_en_o   ( calc_Ez_start_en     ),
@@ -131,10 +122,11 @@ module fdtd_top
 	//fdtd logic
 	//initial signal
 	.fdtd_start_signal_i  ( fdtd_start_signal    ),
-	.field_update_end_i   ( field_update_end     ),
+	//fdfd size
+        .size_i               ( s_size               ),
+	//two basic address of electromagnetic
         .Hy_addr_i            ( Hy_addr              ),
         .Ez_addr_i            ( Ez_addr              ),
-	.buffer_size_i	      ( buffer_size          ),
 	//caculation signal
 	.calc_Hy_start_en_i   ( calc_Hy_start_en     ),
 	.calc_Ez_start_en_i   ( calc_Ez_start_en     ),
@@ -162,7 +154,6 @@ module fdtd_top
 	.buffer_Hy_end_o      ( buffer_Hy_end 	     ),
 	.buffer_Ez_end_o      ( buffer_Ez_end        ),
 	.buffer_src_end_o     ( buffer_src_end	     ),
-	.buffer_end_o	      ( buffer_end           ),
 	//
 	.rdvalid_Hy_o_o	      ( rdvalid_Hy           ),
 	.rdvalid_Ez_o_o	      ( rdvalid_Ez           ),
@@ -172,7 +163,6 @@ module fdtd_top
 	.Hy_n_i	      	      ( Hy_n		     ),
 	.Ez_n_i		      ( Ez_n		     ),
         //user logic
-        .size_i               ( s_size               ),
         .ctrl_int_en_i        ( s_ctrl_int_en        ),
         .cmd_clr_int_pulse_i  ( s_cmd_clr_int_pulse  ),
         .cmd_trigger_pulse_i  ( s_cmd_trigger_pulse  ),
@@ -194,12 +184,10 @@ module fdtd_top
     (
 	.CLK			( ACLK			),
 	.RST_N			( ARESETn		),
-	.buffer_size_i		( buffer_size           ),
 	//ram_buffer -> data_mem
 	.wrt_Hy_start_o 	( wrt_Hy_start		),
 	.wrt_Ez_start_o 	( wrt_Ez_start		),
 	.wrt_src_start_o 	( wrt_src_start		),
-        .sample_point_o         ( sample_point          ),
 	//data_mem -> ram_buffer
 	.mem_rd_Hy_en_i		( mem_rd_Hy_en          ),
 	.mem_rd_Ez_en_i		( mem_rd_Ez_en          ),
@@ -215,7 +203,6 @@ module fdtd_top
 	.buffer_Hy_end_i  	( buffer_Hy_end 	),
 	.buffer_Ez_end_i  	( buffer_Ez_end 	),
 	.buffer_src_end_i       ( buffer_src_end	),
-	.buffer_end_i		( buffer_end		),
 	//calculation flag
 	.calc_Hy_flg_i	        ( calc_Hy_flg           ),
 	.calc_Ez_flg_i	        ( calc_Ez_flg           ),

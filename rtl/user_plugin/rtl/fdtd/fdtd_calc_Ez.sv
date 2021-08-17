@@ -75,8 +75,8 @@ mult_gen_0	multi_Ez_inst2 (
 			.P	( cut_data1 )////cut
 			);
 fdtd_data_delay
-	#(.FDTD_DATA_WIDTH ( FDTD_DATA_WIDTH ),
-	  .DELAY_STAGE     (1)
+	#(.DATA_WIDTH  ( FDTD_DATA_WIDTH ),
+	  .DELAY_STAGE ( 1               )
 	)
 	u1(
 		.CLK   (CLK),

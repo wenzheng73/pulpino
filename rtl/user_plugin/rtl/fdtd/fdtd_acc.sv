@@ -1,9 +1,10 @@
 /*-----------------------------------------------//
-//Module_name:fdtd_acc
-//Version:
-//Function_Description:
-//Author: Emmet
-//Time:
+//Module  : fdtd_acc.sv
+//Version : v1.0.0
+//Function: This is a hardware implementation of
+//          a 1D FDTD module
+//Author  : Emmet
+//Time    : 2021.07
 //-----------------------------------------------*/
 `timescale 1ns/1ps
 
@@ -29,8 +30,6 @@ module fdtd_acc
 	input   logic      		        	buffer_Ez_end_i, 
 	input   logic      		        	buffer_src_end_i, 
 	//
-	input 			        	        buffer_end_i,  //end buffer process
-	input 	logic   [FDTD_DATA_WIDTH-1:0]           buffer_size_i, //buffer size
 	input					        wrtvalid_Hy_old_i,
 	input					        wrtvalid_Ez_old_i,
 	//fdtd calc coefficients
@@ -49,8 +48,6 @@ module fdtd_acc
 	output 	logic   signed   [FDTD_DATA_WIDTH-1:0]	Hy_n_o,
 	output 	logic   signed   [FDTD_DATA_WIDTH-1:0]	Ez_n_o,
 	//ram_buffer -> data_mem
-	//observation point data
-	output	logic	[FDTD_DATA_WIDTH-1:0]	        sample_point_o,
 	input	logic			                mem_rd_Hy_en_i,	
 	input	logic			                mem_rd_Ez_en_i,	
 	input	logic			                mem_rd_end_i,
@@ -87,7 +84,6 @@ logic  [FDTD_DATA_WIDTH-1:0]	Ez_n;
 	(
 		.CLK			( CLK		    ),
 		.RST_N			( RST_N		    ),
-		.buffer_size_i  	( buffer_size_i     ),
 		//data_mem -> ram_buffer
 		//buffer start and end
 		.buffer_Hy_start_i	( buffer_Hy_start_i ),
@@ -136,7 +132,6 @@ logic  [FDTD_DATA_WIDTH-1:0]	Ez_n;
 	fdtd_calc_ctrl_inst(
 		.CLK			( CLK		    ),
 		.RST_N			( RST_N		    ), 
-		.buffer_size_i		( buffer_size_i	    ),
 		//start calculation
 		.calc_Hy_flg_i		( calc_Hy_flg_i     ),
 		.calc_Ez_flg_i	        ( calc_Ez_flg_i     ),
@@ -160,6 +155,7 @@ logic  [FDTD_DATA_WIDTH-1:0]	Ez_n;
 		.wrt_Ez_start_o		( wrt_Ez_start_o    ),	
 		.wrt_src_start_o	( wrt_src_start_o   )	
 	);
+
 //------------having fdtd calculation process-------//
     fdtd_calc_module
 	#(

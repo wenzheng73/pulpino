@@ -1,20 +1,17 @@
 /*-----------------------------------------------//
-//Module_name:fdtd_buffer.sv
-//Version:
-//Function_Description:buffer data of Hy and Ez 
-//Author: Emmet
-//Time:
+//Module  : fdtd_buffer.sv
+//Version : v1.0.0
+//Function: Used to cache electric and magnetic field data
+//Author  : Emmet
+//Time    : 2021.07
 //-----------------------------------------------*/
 module fdtd_buffer 
 #(	parameter 	FDTD_DATA_WIDTH 	= 32,
-	parameter	BUFFER_ADDR_WIDTH     	= 6,
-	parameter	FDTD_BUFFER_DEPTH       = 64
+	parameter	BUFFER_ADDR_WIDTH     	= 6
 	)
 (
 	input					CLK,
 	input 					RST_N,
-	//buffer size
-	input	logic   [FDTD_DATA_WIDTH-1:0]	buffer_size_i,
 	//data_memory -> ram_buffer
 	input 	logic   			buffer_Hy_start_i,
 	input 	logic   			buffer_Ez_start_i,
@@ -192,9 +189,8 @@ always_ff @(posedge CLK or negedge RST_N)
 	end
 //Hy field_value data of previous timestep
 fdtd_ram  
-	#(	.FDTD_DATA_WIDTH 	(FDTD_DATA_WIDTH),
-		.BUFFER_ADDR_WIDTH	(BUFFER_ADDR_WIDTH),
-		.BUFFER_RAM_DEPTH       (FDTD_BUFFER_DEPTH)
+	#(	.FDTD_DATA_WIDTH 	( FDTD_DATA_WIDTH   ),
+		.BUFFER_ADDR_WIDTH	( BUFFER_ADDR_WIDTH )
 	)
 	Hy_old_ram_i(
 		.CLK	(CLK),	
@@ -208,10 +204,9 @@ fdtd_ram
 		.dout   (Hy_old_o)	
 	);
 //Ez field_value data of previous timestep
-fdtd_ram  
-	#(	.FDTD_DATA_WIDTH 	(FDTD_DATA_WIDTH),
-		.BUFFER_ADDR_WIDTH	(BUFFER_ADDR_WIDTH),
-		.BUFFER_RAM_DEPTH       (FDTD_BUFFER_DEPTH)
+fdtd_ram   
+	#(	.FDTD_DATA_WIDTH 	( FDTD_DATA_WIDTH   ),
+		.BUFFER_ADDR_WIDTH	( BUFFER_ADDR_WIDTH )
 	)
 	Ez_old_ram_i(
 		.CLK	(CLK),	
@@ -226,10 +221,8 @@ fdtd_ram
 	);
 //Hy field_value data of current timestep 
 fdtd_ram  
-	#(	.FDTD_DATA_WIDTH 	(FDTD_DATA_WIDTH),
-		.BUFFER_ADDR_WIDTH	(BUFFER_ADDR_WIDTH),
-		.BUFFER_RAM_DEPTH       (FDTD_BUFFER_DEPTH)
-
+	#(	.FDTD_DATA_WIDTH 	( FDTD_DATA_WIDTH   ),
+		.BUFFER_ADDR_WIDTH	( BUFFER_ADDR_WIDTH )
 	)
 	Hy_new_ram_i(
 		.CLK	(CLK),	
@@ -244,10 +237,8 @@ fdtd_ram
 	);
 //Ez field_value data of current timestep 
 fdtd_ram  
-	#(	.FDTD_DATA_WIDTH 	(FDTD_DATA_WIDTH),
-		.BUFFER_ADDR_WIDTH	(BUFFER_ADDR_WIDTH),
-		.BUFFER_RAM_DEPTH       (FDTD_BUFFER_DEPTH)
-
+	#(	.FDTD_DATA_WIDTH 	( FDTD_DATA_WIDTH   ),
+		.BUFFER_ADDR_WIDTH	( BUFFER_ADDR_WIDTH )
 	)
 	Ez_new_ram_i(
 		.CLK	(CLK),	

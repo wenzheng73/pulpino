@@ -21,8 +21,6 @@ module fdtd_mem_ctrl
     output logic                            int_o,
     // fdtd logic
     input  logic 			    fdtd_start_signal_i,
-    input  logic 			    field_update_end_i,
-    input  logic [mstr.AXI_ADDR_WIDTH-1:0]  buffer_size_i,
     //
     input  logic 		            calc_Hy_start_en_i,
     input  logic 		            calc_Ez_start_en_i,
@@ -48,7 +46,6 @@ module fdtd_mem_ctrl
     output logic			    buffer_Hy_end_o,
     output logic			    buffer_Ez_end_o,
     output logic			    buffer_src_end_o,
-    output logic			    buffer_end_o,
     output logic			    rdvalid_Hy_o_o,
     output logic			    rdvalid_Ez_o_o,
     // ram_buffer -> data_mem
@@ -208,7 +205,7 @@ module fdtd_mem_ctrl
 	buffer_Hy_end_o   = 1'b0;
 	buffer_Ez_end_o   = 1'b0;
 	buffer_src_end_o  = 1'b0;
-	buffer_end_o	  = 1'b0;
+
 	
         s_w_data_store = 1'b0;
         status_busy_o  = 1'b1;
@@ -279,7 +276,6 @@ module fdtd_mem_ctrl
 		rd_Ez_sgl         = 1'b1;
 		if (buffer_Ez_last_0||buffer_Ez_last_1)begin
 		    buffer_Ez_end_o= 1'b1;
-		    buffer_end_o   = 1'b1;
                     s_r_req        = 1'b0;
                     s_CS_n         = INIT_CALC_PROCESS;
                 end
@@ -307,24 +303,20 @@ module fdtd_mem_ctrl
 	     end
 	    WAIT_CALC_END:
             begin
-		    buffer_end_o   = 1'b1;
 		    buffer_Ez_end_o= 1'b0;
 		    buffer_src_end_o= 1'b0;
 		    rd_Ez_sgl      = 1'b0;
 		    rd_Hy_sgl      = 1'b0;
 		    rd_src_sgl     = 1'b0;
 		if (wrt_Hy_start_i)begin
-		    buffer_end_o   = 1'b0;
 		    s_w_data_store = 1'b1;
 		    s_CS_n         = INIT_WRITE_HY;
 		end
 	    	else if (wrt_Ez_start_i)begin
-		    buffer_end_o   = 1'b0;
 	            s_w_data_store = 1'b1;
 		    s_CS_n         = INIT_WRITE_EZ;
 		end
 		else if (wrt_src_start_i)begin
-		   buffer_end_o    = 1'b0;
 		   s_CS_n          = INIT_WRITE_SRC; 
 		end
 		else begin
@@ -421,7 +413,6 @@ module fdtd_mem_ctrl
 		    s_r_req           = 1'b0;
 		    buffer_src_start_o= 1'b0;
 		    buffer_src_end_o= 1'b1;
-		    buffer_end_o   = 1'b1;
                     s_CS_n         = INIT_CALC_PROCESS;
                 end
             end
