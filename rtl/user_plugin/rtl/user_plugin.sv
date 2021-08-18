@@ -7,9 +7,8 @@ module user_plugin
 
     APB_BUS.Slave      apb_slv,
     AXI_BUS.Slave      axi_slv,
-    AXI_BUS.Slave      axi_slv1,
     AXI_BUS.Master     axi_mstr,
-    AXI_BUS.Master     axi_mstr1,
+
 
     input  logic [7:0] upio_in_i,
     output logic [7:0] upio_out_o,
@@ -50,22 +49,22 @@ module user_plugin
         .int_o      ( apb_up_int_o        )
     );
 
-    axi_up axi_up_i
+   /* axi_up axi_up_i
     (
         .ACLK    ( clk_i        ),
         .ARESETn ( rst_n        ),
         .slv     ( axi_slv      ),
         .mstr    ( axi_mstr     ),
         .int_o   ( axi_up_int_o )
-    );
+    );*/
 
     fdtd_top fdtd_top_i
     (
         .ACLK    ( clk_i        ),
         .ARESETn ( rst_n        ),
-        .slv     ( axi_slv1      ),
-        .mstr    ( axi_mstr1     ),
-        .int_o   ( fdtd_up_int_o )
+        .slv     ( axi_slv      ),
+        .mstr    ( axi_mstr     ),
+        .int_o   ( fdtd_up_int_o)
     );
 
 endmodule

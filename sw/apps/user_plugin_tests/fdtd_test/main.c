@@ -6,7 +6,7 @@
 #include "user_plugin/fdtd/fdtd.h"
 #include "user_plugin/fdtd/field_source.h"
 #include "user_plugin/fdtd/coefficients.h"
-#include "user_plugin/fdtd/mtlb_data.h"
+#include "user_plugin/fdtd/gold_data.h"
 
 #define IRQ_IDX 		22
 
