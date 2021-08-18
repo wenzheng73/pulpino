@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <math.h>
+#include <stdlib.h>
 #include "int.h"
 #include "event.h"
 #include "user_plugin/fdtd/fdtd.h"
@@ -10,7 +11,7 @@
 #define IRQ_IDX 		22
 
 //FDTD PARAMETER
-#define NUMBER_OF_TIME_STEPS    20
+#define NUMBER_OF_TIME_STEPS    60
 #define GRID_SIZE	        100
 #define OBSERVATION_POINT       20
 #define UNUSED_SIZE             50 
@@ -28,11 +29,19 @@
        __typeof__ (b) _b = (b); \
        _a < _b ? _a : _b; })
 
-//----------------------fdtd logic--------------------------//
+/*----------------------fdtd logic-----------------------------------//
+//This program demonstrates a one-dimensional FDTD simulation.
+//The problem geometry is composed of two PEC plates extending to
+//infinity in y, and z dimensions, parallel to each other with 1 meter
+//separation. The space between the PEC plates is filled with air.
+//A sheet of current source paralle to the PEC plates is placed 
+//at the center of the problem space. The current source excites fields 
+//in the problem space due to a z-directed current density Jz, 
+//which has a Gaussian waveform in time. 
 //Here is the software control part of a one-dimensional FDTD 
 //method for SOC hardware implementation, no absorption boundary 
 //is added, and the boundary location is set to PEC medium.
-//----------------------------------------------------------//
+//-------------------------------------------------------------------*/
 //loading field_source(point source)
 void load_field_source(int current_timestep){
 	//
@@ -105,11 +114,10 @@ void update_Ez_process(int src_position){
 		    break;
 		}	
 	}
-	printf("this position's Ez field_value is: Ez[%d] = %d, Ez[%d] = %d, Ez[%d] = %d, Ez[%d] = %d, Ez[%d] = %d .\n",
+	printf("this position's Ez field_value is: Ez[%d] = %d, Ez[%d] = %d, Ez[%d] = %d, Ez[%d] = %d .\n",
 			1,Ez[1],
         		src_position, Ez[src_position],
 			OBSERVATION_POINT-1,Ez[OBSERVATION_POINT-1],	
-			GRID_SIZE-1,Ez[GRID_SIZE-1],
 			GRID_SIZE,Ez[GRID_SIZE]
 			);
 	CALC_EZ_SGL = FDTD_CALC_CLR_BIT;
@@ -149,11 +157,11 @@ void sample_data(int i){
 }
 
 //Performing data error comparisons
-#define FIXED_POINT_1E_NEG_3 0x00000831
+#define FIXED_POINT_5E_NEG_3 0x000028F6
 void compare_observation_point_error(unsigned int number_of_time_steps, unsigned int number_of_tests, int* errors){
 	 int abs_error;
 	 int temp_data[NUMBER_OF_TIME_STEPS];
-         printf("Perform comparison of calculated data errors!!!!\n");
+         printf("Perform comparison of calculated data errors. !!!\n");
 	 switch (number_of_tests){
           case 0:for(size_t i;i<number_of_time_steps;i++){
 			 temp_data[i] = check_data_v0[i];
@@ -170,10 +178,10 @@ void compare_observation_point_error(unsigned int number_of_time_steps, unsigned
          }
          for (size_t i=0; i<number_of_time_steps; i++){
              abs_error = abs(temp_data[i]-observation_data[i]);
-	     if (abs_error > FIXED_POINT_1E_NEG_3){
+	     if (abs_error > FIXED_POINT_5E_NEG_3){
 		 ++(*errors);
 		 printf("This position's Ez field_value is: Ez[%d] = %d .\n",i,observation_data[i]);
-		 printf("There is a problem with the calculation process,please debug:abs_error[%d] = %d .!!!\n",i,abs_error);
+		 printf("There is a problem with the calculation process,please debug:abs_error[%d] = %d. !!!\n",i,abs_error);
 	     }else {
 	         printf("Congratulations, pass[%d]!!!\n",i);
 	     }
