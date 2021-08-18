@@ -394,30 +394,7 @@ always_ff @(posedge CLK, negedge RST_N)
 	                wrt_Ez_n_en_r3 <= wrt_Ez_n_en_r2;
 	                wrt_Ez_n_en    <= wrt_Ez_n_en_r3;
 		end
-	end
-    /*fdtd_data_delay 
-                   #(
-		       .DATA_WIDTH  ( 1                ),
-		       .DELAY_STAGE ( HY_PIPE_LEN+1'b1 )
-		   )
-		   delay_wrt_Hy_en_i(
-		       .CLK         ( CLK            ),
-		       .RST_N       ( RST_N          ),
-		       .data_i      ( wrt_Hy_n_en_r0 ),
-		       .data_o      ( wrt_Hy_n_en    )
-		   );
-    fdtd_data_delay 
-                   #(
-		       .DATA_WIDTH  ( 1                ),
-		       .DELAY_STAGE ( EZ_PIPE_LEN+1'b1 )
-		   )
-		   delay_wrt_Ez_en_i(
-		       .CLK         ( CLK            ),
-		       .RST_N       ( RST_N          ),
-		       .data_i      ( wrt_Ez_n_en_r0 ),
-		       .data_o      ( wrt_Ez_n_en    )
-		   );*/
-
+	end 
 //--------generate Hy's reading address of RAM--------------//
 logic [BUFFER_ADDR_WIDTH-1:0] rd_Hy_old_addr_r0;
 
