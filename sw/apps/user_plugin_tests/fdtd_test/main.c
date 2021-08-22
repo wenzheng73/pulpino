@@ -127,9 +127,9 @@ void update_src_process(int src_position){
 	    printf("calc_src_status:%d. <_>\n",calc_src_status);
 	    if(calc_src_status){
     	    printf("update_status:having src calculation process. >_<!!!\n");
-	    }else {
+        }else {
             break;
-	    }
+        }
     }
     printf("this position's Ez field_value is: Ez[%d] = %d .\n",src_position,Ez[src_position]);
     EZ_ADDR =  (int)Ez;
