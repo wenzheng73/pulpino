@@ -107,7 +107,7 @@ void update_Ez_process(int src_position){
 	    if(calc_Ez_status){
 		    printf("update_status:having Ez calculation process. >_<!!!\n");
         }else {
-		    break;
+            break;
         }	
     }
     printf("this position's Ez field_value is: Ez[%d] = %d, Ez[%d] = %d, Ez[%d] = %d, Ez[%d] = %d .\n",
@@ -128,7 +128,7 @@ void update_src_process(int src_position){
 	    if(calc_src_status){
     	    printf("update_status:having src calculation process. >_<!!!\n");
 	    }else {
-		    break;
+            break;
 	    }
     }
     printf("this position's Ez field_value is: Ez[%d] = %d .\n",src_position,Ez[src_position]);
@@ -180,11 +180,11 @@ void compare_observation_point_error(unsigned int number_of_time_steps, unsigned
     for (size_t i = 0; i < number_of_time_steps; ++i){
         abs_error = abs(temp_data[i]-observation_data[i]);
         if (abs_error > FIXED_POINT_5E_NEG_3){
-	        ++(*errors);
+            ++(*errors);
             printf("This position's Ez field_value is: Ez[%d] = %d .\n",i,observation_data[i]);
             printf("There is a problem with the calculation process,please debug:abs_error[%d] = %d. !!!\n",i,abs_error);
         }else {
-	        printf("Congratulations, pass[%d]!!!\n",i);
+            printf("Congratulations, pass[%d]!!!\n",i);
         }
     }
 }
