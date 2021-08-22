@@ -56,10 +56,10 @@ void initialize_field_space(int word_n){
     printf("initialize problem space!!!\n");
     for (size_t i = 0; i < sizeof(Hy)/sizeof(Hy[0]); ++i){
         Hy[i] = 0;
-	}
+    }
     for (size_t j = 0; j < sizeof(Ez)/sizeof(Ez[0]); ++j){
         Ez[j] = 0;
-	}
+    }
     HY_ADDR = (int)Hy;
     EZ_ADDR = (int)Ez;
     FDTD_SIZE = word_n;
