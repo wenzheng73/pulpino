@@ -53,21 +53,21 @@ int Hy[GRID_SIZE+UNUSED_SIZE];
 int Ez[GRID_SIZE+UNUSED_SIZE];
 
 void initialize_field_space(int word_n){
-	printf("initialize problem space!!!\n");
-	for (size_t i = 0; i < sizeof(Hy)/sizeof(Hy[0]); ++i){
+    printf("initialize problem space!!!\n");
+    for (size_t i = 0; i < sizeof(Hy)/sizeof(Hy[0]); ++i){
         Hy[i] = 0;
 	}
-	for (size_t j = 0; j < sizeof(Ez)/sizeof(Ez[0]); ++j){
+    for (size_t j = 0; j < sizeof(Ez)/sizeof(Ez[0]); ++j){
         Ez[j] = 0;
 	}
-	HY_ADDR = (int)Hy;
-	EZ_ADDR = (int)Ez;
-	FDTD_SIZE = word_n;
+    HY_ADDR = (int)Hy;
+    EZ_ADDR = (int)Ez;
+    FDTD_SIZE = word_n;
 }
 
 void read_coefficient(){
-	//    
-	printf("read relation coefficient!!!\n");
+    //    
+    printf("read relation coefficient!!!\n");
     //Assign values to the coefficient terms in the update process
     FDTD_CEZE  = coes[0];
     FDTD_CEZHY = coes[1];
@@ -79,7 +79,7 @@ void read_coefficient(){
 }
 
 void update_Hy_process(int src_position){
-        //
+    //
 	CALC_HY_SGL = FDTD_CALC_TRIGGER_BIT;
 	while(1){
 	    int calc_Hy_status = CALC_HY_SGL;
