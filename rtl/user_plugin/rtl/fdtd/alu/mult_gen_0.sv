@@ -1,8 +1,8 @@
 module mult_gen_0
 #(parameter WIDTH = 32)
 (
-	input 					CLK,
-	input 					CE,
+	input                               CLK,
+	input                               CE,
 	//
 	input 	logic signed [WIDTH-1:0]	A,
 	input 	logic signed [WIDTH-1:0]	B,

@@ -3,10 +3,10 @@ module c_addsub_0
     parameter WIDTH = 32
 	)
 (
-	input 				CLK,
+	input                           CLK,
 	//
-	input 				ADD,
-	input 				CE,
+	input                           ADD,
+	input                           CE,
 	input  logic signed [WIDTH-1:0]	A,
 	input  logic signed [WIDTH-1:0]	B,
 	//
