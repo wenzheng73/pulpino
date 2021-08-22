@@ -360,7 +360,7 @@ module fdtd_mem_ctrl
             begin
                 s_w_req   = 1'b1;
                 wt_Ez_sgl = 1'b1;
-                if (r_word_size == 'd0)begin
+                if (r_word_size == 'd1)begin
                     mem_rd_end_o = 1'b1;
                     s_CS_n       = WAIT_1;
                 end
@@ -449,35 +449,35 @@ module fdtd_mem_ctrl
     //
     always_ff @(posedge ACLK,negedge ARESETn)begin
         if (!ARESETn)
-            calc_Hy_end_flg = 1'b0;
+            calc_Hy_end_flg <= 1'b0;
         else if (r_word_size == 'd0 && r_CS == WAIT_WRITE_HY)
-            calc_Hy_end_flg = 1'b1;
+            calc_Hy_end_flg <= 1'b1;
         else if (calc_Hy_end_flg == 1'b1 && calc_Ez_start_en_i )
-            calc_Hy_end_flg = 1'b0;
+            calc_Hy_end_flg <= 1'b0;
         else   
-            calc_Hy_end_flg = calc_Hy_end_flg;
+            calc_Hy_end_flg <= calc_Hy_end_flg;
     end
     //
     always_ff @(posedge ACLK,negedge ARESETn)begin
         if (!ARESETn)
-            calc_Ez_end_flg = 1'b0;
-        else if (r_word_size == 'd0 && r_CS == WAIT_WRITE_EZ)
-            calc_Ez_end_flg = 1'b1;
+            calc_Ez_end_flg <= 1'b0;
+        else if (r_word_size == 'd1 && r_CS == WAIT_WRITE_EZ)
+            calc_Ez_end_flg <= 1'b1;
         else if (calc_Ez_end_flg == 1'b1 && calc_src_start_en_i )
-            calc_Ez_end_flg = 1'b0;
+            calc_Ez_end_flg <= 1'b0;
         else   
-            calc_Ez_end_flg = calc_Ez_end_flg;
+            calc_Ez_end_flg <= calc_Ez_end_flg;
     end
     //
     always_ff @(posedge ACLK,negedge ARESETn)begin
         if (!ARESETn)
-            calc_src_end_flg = 1'b0;
+            calc_src_end_flg <= 1'b0;
         else if (s_CS_n == WAIT_2)
-            calc_src_end_flg = 1'b1;
+            calc_src_end_flg <= 1'b1;
         else if (calc_src_end_flg == 1'b1 && calc_Hy_start_en_i )
-            calc_src_end_flg = 1'b0;
+            calc_src_end_flg <= 1'b0;
         else   
-            calc_src_end_flg = calc_src_end_flg;
+            calc_src_end_flg <= calc_src_end_flg;
     end
     
     //////////////////////////////////////

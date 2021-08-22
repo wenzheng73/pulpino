@@ -250,7 +250,7 @@ int main() {
     int src_position;
     for (size_t i = 0; i < NUMBER_OF_TESTS; ++i){
       switch (i){
-          case 0:src_position =   5;break;
+          case 0:src_position =  5;break;
           case 1:src_position =  40;break;
           case 2:src_position =  95;break;
       }
