@@ -54,7 +54,7 @@ module fdtd_mem_word_rd
 );
 
 logic [AXI4_ADDR_WIDTH - 1: 0] s_r_addr;
-logic [7:0]		       read_burst_cnt;
+//logic [7:0]		               read_burst_cnt;
 // Extend word addr to byte addr
 assign s_r_addr =  {rd_word_addr_i,2'h0};
 ////////////////////

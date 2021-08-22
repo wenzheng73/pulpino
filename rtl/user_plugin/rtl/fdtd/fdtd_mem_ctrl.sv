@@ -20,17 +20,17 @@ module fdtd_mem_ctrl
     output logic                            status_int_pending_o,
     output logic                            int_o,
     // fdtd logic
-    input  logic 			    fdtd_start_signal_i,
+    input  logic                            fdtd_start_signal_i,
     //
-    input  logic 		            calc_Hy_start_en_i,
-    input  logic 		            calc_Ez_start_en_i,
-    input  logic 		            calc_src_start_en_i,
-    output logic			    calc_Hy_flg_o,
-    output logic			    calc_Ez_flg_o,
-    output logic			    calc_src_flg_o,
-    output logic			    calc_Hy_end_flg_o,
-    output logic			    calc_Ez_end_flg_o,
-    output logic			    calc_src_end_flg_o,
+    input  logic                            calc_Hy_start_en_i,
+    input  logic                            calc_Ez_start_en_i,
+    input  logic                            calc_src_start_en_i,
+    output logic                            calc_Hy_flg_o,
+    output logic                            calc_Ez_flg_o,
+    output logic                            calc_src_flg_o,
+    output logic                            calc_Hy_end_flg_o,
+    output logic                            calc_Ez_end_flg_o,
+    output logic                            calc_src_end_flg_o,
     // read/write address
     input  logic [mstr.AXI_ADDR_WIDTH-1:0]  Hy_addr_i,
     input  logic [mstr.AXI_ADDR_WIDTH-1:0]  Ez_addr_i,
@@ -40,40 +40,39 @@ module fdtd_mem_ctrl
     output logic [mstr.AXI_DATA_WIDTH-1:0]  Hy_old_o,
     output logic [mstr.AXI_DATA_WIDTH-1:0]  Ez_old_o,
     // data_mem -> ram_buffer
-    output logic			    buffer_Hy_start_o,
-    output logic			    buffer_Ez_start_o,
-    output logic			    buffer_src_start_o,
-    output logic			    buffer_Hy_end_o,
-    output logic			    buffer_Ez_end_o,
-    output logic			    buffer_src_end_o,
-    output logic			    rdvalid_Hy_o_o,
-    output logic			    rdvalid_Ez_o_o,
+    output logic                            buffer_Hy_start_o,
+    output logic                            buffer_Ez_start_o,
+    output logic                            buffer_src_start_o,
+    output logic                            buffer_Hy_end_o,
+    output logic                            buffer_Ez_end_o,
+    output logic                            buffer_src_end_o,
+    output logic                            rdvalid_Hy_o_o,
+    output logic                            rdvalid_Ez_o_o,
     // ram_buffer -> data_mem
-    input  logic			    wrt_Hy_start_i,
-    input  logic			    wrt_Ez_start_i,
-    input  logic			    wrt_src_start_i,
-    output logic  			    wrtvalid_sgl_o,
-    output logic			    mem_rd_Hy_en_o,
-    output logic			    mem_rd_Ez_en_o,
-    output logic			    mem_rd_end_o
+    input  logic                            wrt_Hy_start_i,
+    input  logic                            wrt_Ez_start_i,
+    input  logic                            wrt_src_start_i,
+    output logic                            wrtvalid_sgl_o,
+    output logic                            mem_rd_Hy_en_o,
+    output logic                            mem_rd_Ez_en_o,
+    output logic                            mem_rd_end_o
 );
 	// function called clogb2 that returns an integer which has the
 	//value of the ceiling of the log base 2
 
-	  // function called clogb2 that returns an integer which has the 
-	  // value of the ceiling of the log base 2.                      
-	  /*function integer clogb2 (input integer bit_depth);              
+    // function called clogb2 that returns an integer which has the 
+	// value of the ceiling of the log base 2.                      
+	/*function integer clogb2 (input integer bit_depth);              
 	  begin                                                           
 	    for(clogb2=0; bit_depth>0; clogb2=clogb2+1)                   
 	      bit_depth = bit_depth >> 1;                                 
 	    end                                                           
 	  endfunction*/
-    logic [7:0] burst_size_byte;
-    assign burst_size_byte = AXI4_LENTH;
+    //logic [7:0] burst_size_byte;
+    //assign burst_size_byte = AXI4_LENTH;
     /////////////////////////////////////////
     // Data Reading/Writing Processing //////
     /////////////////////////////////////////
-
     logic [mstr.AXI_ADDR_WIDTH-2-1: 0]     r_r_Hy_word_addr;  // Read Hy address by word
     logic [mstr.AXI_ADDR_WIDTH-2-1: 0]     r_r_Ez_word_addr;  // Read Ez address by word
     logic [mstr.AXI_ADDR_WIDTH-2-1: 0]     r_r_Ez_word_addr_0;// Read Ez address by word
@@ -94,91 +93,87 @@ module fdtd_mem_ctrl
     logic                                  s_w_gnt;  // Write memory grant
     
     //
-    logic 				   calc_Hy_end_flg;
-    logic 				   calc_Ez_end_flg;
-    logic 				   calc_src_end_flg;
+    logic                                  calc_Hy_end_flg;
+    logic                                  calc_Ez_end_flg;
+    logic                                  calc_src_end_flg;
 
-    logic			           rd_Hy_sgl;
-    logic			           rd_Ez_sgl;
-    logic			           rd_src_sgl;
+    logic                                  rd_Hy_sgl;
+    logic                                  rd_Ez_sgl;
+    logic                                  rd_src_sgl;
     //
-    logic			           wt_Hy_sgl;
-    logic			           wt_Ez_sgl;
-    logic			           wt_src_sgl;
-    logic			           buffer_Hy_last_0;
-    logic			           buffer_Hy_last_1;
-    logic			           buffer_Ez_last_0;
-    logic			           buffer_Ez_last_1;
-    logic			           nxt_buffer_en;
+    logic                                  wt_Hy_sgl;
+    logic                                  wt_Ez_sgl;
+    logic                                  wt_src_sgl;
+    logic                                  buffer_Hy_last_0;
+    logic                                  buffer_Hy_last_1;
+    logic                                  buffer_Ez_last_0;
+    logic                                  buffer_Ez_last_1;
+    logic                                  nxt_buffer_en;
     //record write field_data number
-    logic [REG_SIZE_WIDTH-1:0]	           record_num_cnt;      
+    logic [REG_SIZE_WIDTH-1:0]             record_num_cnt;      
     //
     enum logic [4:0] {  IDLE,
                         INIT_READ_HY,
-			WAIT_READ_HY,
+                        WAIT_READ_HY,
                         INIT_READ_EZ,
                         WAIT_READ_EZ,
-			INIT_CALC_PROCESS,
-			WAIT_CALC_END,
+                        INIT_CALC_PROCESS,
+                        WAIT_CALC_END,
                         INIT_WRITE_HY,
                         WAIT_WRITE_HY,
-			WAIT_0,
-			INIT_WRITE_EZ,
+                        WAIT_0,
+                        INIT_WRITE_EZ,
                         WAIT_WRITE_EZ,
-			WAIT_1,
-			INIT_READ_SRC,
-			WAIT_READ_SRC,
-			INIT_WRITE_SRC,
-			WAIT_WRITE_SRC,
-			WAIT_2
+                        WAIT_1,
+                        INIT_READ_SRC,
+                        WAIT_READ_SRC,
+                        INIT_WRITE_SRC,
+                        WAIT_WRITE_SRC,
+                        WAIT_2
                      } r_CS, s_CS_n; 
     //add some logic
     //A very simple process
     //assign s_w_data = {s_r_data[$size(s_r_data) - 2: 0], 1'b0};
     //data_mem -> ram_buffer
     //write field_value data
-    assign s_w_data          = wt_Hy_sgl ? Hy_n_i   : 
-	    		      ((wt_Ez_sgl||wt_src_sgl) ? Ez_n_i  : 'd0);
+    assign s_w_data          = wt_Hy_sgl ? Hy_n_i : ((wt_Ez_sgl||wt_src_sgl) ? Ez_n_i : 'd0);
 
     //read/write address
-    assign r_r_word_addr     = rd_Hy_sgl ? r_r_Hy_word_addr :
-	   		      ((rd_Ez_sgl||rd_src_sgl) ? (calc_Ez_start_en_i ? r_r_Ez_word_addr_0 : r_r_Ez_word_addr): 'd0);
-    assign r_w_word_addr     = wt_Hy_sgl ? r_w_Hy_word_addr : 
-	    		      ((wt_Ez_sgl||wt_src_sgl) ? r_w_Ez_word_addr : 'd0);
+    assign r_r_word_addr     = rd_Hy_sgl ? r_r_Hy_word_addr : ((rd_Ez_sgl||rd_src_sgl) 
+	                                     ? (calc_Ez_start_en_i ? r_r_Ez_word_addr_0 : r_r_Ez_word_addr): 'd0);
+
+    assign r_w_word_addr     = wt_Hy_sgl ? r_w_Hy_word_addr : ((wt_Ez_sgl||wt_src_sgl) 
+	                                     ? r_w_Ez_word_addr : 'd0);
 
     //signal of writing field_value data to data_mem 
     assign wrtvalid_sgl_o    = ((r_CS == WAIT_WRITE_HY || r_CS == WAIT_WRITE_EZ || r_CS == WAIT_WRITE_SRC)
-    		                 &&mstr.aw_valid&&mstr.aw_ready)? 1'b1 : 1'b0;
+	                           && mstr.aw_valid && mstr.aw_ready) ? 1'b1 : 1'b0;
     //data_mem -> ram_buffer
     //read data valid signal 
-    assign rdvalid_Hy_o_o    =  (rd_Hy_sgl & mstr.r_valid & mstr.r_ready);  
-    assign rdvalid_Ez_o_o    =  ((rd_Ez_sgl||rd_src_sgl) & mstr.r_valid & mstr.r_ready); 
+    assign rdvalid_Hy_o_o    = (rd_Hy_sgl & mstr.r_valid & mstr.r_ready);  
+    assign rdvalid_Ez_o_o    = ((rd_Ez_sgl||rd_src_sgl) & mstr.r_valid & mstr.r_ready); 
 
     //read field_value data
     assign Hy_old_o          = rd_Hy_sgl ? s_r_data : 'd0;
     assign Ez_old_o          = (rd_Ez_sgl||rd_src_sgl) ? s_r_data : 'd0;
     //
-    assign buffer_Hy_last_0  = calc_Hy_start_en_i ? ((record_num_cnt == BUFFER_SIZE)
-    				&&rd_Hy_sgl) : 1'b0;
-    assign buffer_Hy_last_1  = calc_Ez_start_en_i ? ((record_num_cnt == BUFFER_SIZE+1'b1)
-    				&&rd_Hy_sgl) : 1'b0;
-    assign buffer_Ez_last_0  = calc_Hy_start_en_i ? ((record_num_cnt == BUFFER_SIZE+1'b1)
-    				&&rd_Ez_sgl) : 1'b0; 
-    assign buffer_Ez_last_1  = calc_Ez_start_en_i ? ((record_num_cnt == BUFFER_SIZE)
-    				&&rd_Ez_sgl) : 1'b0;
-    assign nxt_buffer_en     = ((record_num_cnt == BUFFER_SIZE)
-    				&&(r_CS == WAIT_WRITE_HY || r_CS == WAIT_WRITE_EZ))? 1'b1:1'b0;   
+    assign buffer_Hy_last_0  = calc_Hy_start_en_i ? ((record_num_cnt == BUFFER_SIZE) && rd_Hy_sgl) : 1'b0;
+    assign buffer_Hy_last_1  = calc_Ez_start_en_i ? ((record_num_cnt == BUFFER_SIZE+1'b1) && rd_Hy_sgl) : 1'b0;
+
+    assign buffer_Ez_last_0  = calc_Hy_start_en_i ? ((record_num_cnt == BUFFER_SIZE+1'b1) && rd_Ez_sgl) : 1'b0; 
+    assign buffer_Ez_last_1  = calc_Ez_start_en_i ? ((record_num_cnt == BUFFER_SIZE) && rd_Ez_sgl) : 1'b0;
+
+    assign nxt_buffer_en     = ((record_num_cnt == BUFFER_SIZE) && (r_CS == WAIT_WRITE_HY || r_CS == WAIT_WRITE_EZ))
+	                           ? 1'b1:1'b0;   
     assign calc_Hy_end_flg_o = calc_Hy_end_flg;
     assign calc_Ez_end_flg_o = calc_Ez_end_flg;
-    assign calc_src_end_flg_o = calc_src_end_flg;
+    assign calc_src_end_flg_o= calc_src_end_flg;
     //
     always_ff @(posedge ACLK, negedge ARESETn)
     begin
         if (~ARESETn)
             r_w_data <= 'b0;
-        //else if (s_w_data_store)
-          //  r_w_data <= s_w_data;
-	else 
+        else 
             r_w_data <= s_w_data;
     end
 
@@ -195,28 +190,27 @@ module fdtd_mem_ctrl
         s_r_req        = 1'b0;
         s_w_req        = 1'b0;
 
-	calc_Hy_flg_o  = 1'b0;
-	calc_Ez_flg_o  = 1'b0;
-	calc_src_flg_o = 1'b0;
-
-	buffer_Hy_start_o = 1'b0;
-	buffer_Ez_start_o = 1'b0;
-	buffer_src_start_o= 1'b0;
-	buffer_Hy_end_o   = 1'b0;
-	buffer_Ez_end_o   = 1'b0;
-	buffer_src_end_o  = 1'b0;
-
+        calc_Hy_flg_o  = 1'b0;
+        calc_Ez_flg_o  = 1'b0;
+        calc_src_flg_o = 1'b0;
+        
+        buffer_Hy_start_o = 1'b0;
+        buffer_Ez_start_o = 1'b0;
+        buffer_src_start_o= 1'b0;
+        buffer_Hy_end_o   = 1'b0;
+        buffer_Ez_end_o   = 1'b0;
+        buffer_src_end_o  = 1'b0;
 	
         s_w_data_store = 1'b0;
         status_busy_o  = 1'b1;
 
-	mem_rd_Hy_en_o = 1'b0;
-	mem_rd_Ez_en_o = 1'b0;
-	mem_rd_end_o   = 1'b0;
-
-	rd_Hy_sgl      = 1'b0;
-	rd_Ez_sgl      = 1'b0;
-	rd_src_sgl     = 1'b0;
+        mem_rd_Hy_en_o = 1'b0;
+        mem_rd_Ez_en_o = 1'b0;
+        mem_rd_end_o   = 1'b0;
+        
+        rd_Hy_sgl      = 1'b0;
+        rd_Ez_sgl      = 1'b0;
+        rd_src_sgl     = 1'b0;
         wt_Hy_sgl      = 1'b0;
         wt_Ez_sgl      = 1'b0;
         wt_src_sgl     = 1'b0;
@@ -225,370 +219,373 @@ module fdtd_mem_ctrl
             IDLE:
             begin
                 status_busy_o = 1'b0;
-  	        s_r_req       = 1'b0;
-		if (~fdtd_start_signal_i)begin
+                s_r_req       = 1'b0;
+                if (~fdtd_start_signal_i)begin
                     s_CS_n = IDLE;
-		    /*calc_Hy_end_flg_o= 1'b0; 
-		    calc_Ez_end_flg_o= 1'b0; 
-		    calc_src_end_flg_o= 1'b0; */
-		end
+                end
                 else
                 begin
                     s_CS_n            = INIT_READ_HY;
-		    buffer_Hy_start_o = 1'b1;
+                    buffer_Hy_start_o = 1'b1;
                 end
             end
 
             INIT_READ_HY:
-	    begin
-                s_CS_n    = WAIT_READ_HY;
-		mem_rd_end_o   = 1'b0;
-	    end
+            begin
+                s_CS_n       = WAIT_READ_HY;
+                mem_rd_end_o = 1'b0;
+            end
 
             WAIT_READ_HY:
             begin
                 s_r_req           = 1'b1;
-		buffer_Hy_start_o = 1'b0;
-		rd_Hy_sgl         = 1'b1;
-		/*if (~s_r_gnt)begin
-                    s_CS_n = WAIT_READ_HY;
-		end*/
-	    	if (buffer_Hy_last_0||buffer_Hy_last_1)begin
-	    	    buffer_Hy_end_o   = 1'b1;
+                buffer_Hy_start_o = 1'b0;
+                rd_Hy_sgl         = 1'b1;
+                if (buffer_Hy_last_0||buffer_Hy_last_1)begin
+                    buffer_Hy_end_o   = 1'b1;
                     s_r_req           = 1'b0;
-		    s_CS_n            = INIT_READ_EZ;
-		    buffer_Ez_start_o   = 1'b1;
-
-		end
+                    s_CS_n            = INIT_READ_EZ;
+                    buffer_Ez_start_o = 1'b1;
+                end
             end
 
-	    INIT_READ_EZ:
+            INIT_READ_EZ:
             begin
                 s_CS_n    = WAIT_READ_EZ;
-		rd_Hy_sgl = 1'b0;
+                rd_Hy_sgl = 1'b0;
             end
 
             WAIT_READ_EZ:
             begin
-		buffer_Hy_end_o   = 1'b0;
+                buffer_Hy_end_o   = 1'b0;
                 s_r_req           = 1'b1;
-		buffer_Ez_start_o = 1'b0;
-		rd_Ez_sgl         = 1'b1;
-		if (buffer_Ez_last_0||buffer_Ez_last_1)begin
-		    buffer_Ez_end_o= 1'b1;
-                    s_r_req        = 1'b0;
-                    s_CS_n         = INIT_CALC_PROCESS;
+                buffer_Ez_start_o = 1'b0;
+                rd_Ez_sgl         = 1'b1;
+                if (buffer_Ez_last_0||buffer_Ez_last_1)begin
+                    buffer_Ez_end_o = 1'b1;
+                    s_r_req       = 1'b0;
+                    s_CS_n        = INIT_CALC_PROCESS;
                 end
             end
-    	    INIT_CALC_PROCESS:
-	    begin
-		    if(calc_Hy_start_en_i)begin
-			    calc_Hy_flg_o = 1'b1;
-			    s_CS_n    = WAIT_CALC_END;
-		    end
-		    else if (calc_Ez_start_en_i)begin
-			    calc_Ez_flg_o = 1'b1;
-			    s_CS_n   = WAIT_CALC_END;
-	            end
-		    else if (calc_src_start_en_i)begin
-			    calc_src_flg_o = 1'b1;
-			    s_CS_n   = WAIT_CALC_END;
-		    end
-		    else begin
-			    calc_Hy_flg_o = 1'b0;
-			    calc_Ez_flg_o = 1'b0;
-			    calc_src_flg_o = 1'b0;
-			    s_CS_n   = INIT_CALC_PROCESS;
-	            end
-	     end
-	    WAIT_CALC_END:
+
+            INIT_CALC_PROCESS:
             begin
-		    buffer_Ez_end_o= 1'b0;
-		    buffer_src_end_o= 1'b0;
-		    rd_Ez_sgl      = 1'b0;
-		    rd_Hy_sgl      = 1'b0;
-		    rd_src_sgl     = 1'b0;
-		if (wrt_Hy_start_i)begin
-		    s_w_data_store = 1'b1;
-		    s_CS_n         = INIT_WRITE_HY;
-		end
-	    	else if (wrt_Ez_start_i)begin
-	            s_w_data_store = 1'b1;
-		    s_CS_n         = INIT_WRITE_EZ;
-		end
-		else if (wrt_src_start_i)begin
-		   s_CS_n          = INIT_WRITE_SRC; 
-		end
-		else begin
-		    s_w_data_store = 1'b0;
-		    s_CS_n         = WAIT_CALC_END;
-		end
-    	    end
+                if(calc_Hy_start_en_i)begin
+                    calc_Hy_flg_o = 1'b1;
+                    s_CS_n        = WAIT_CALC_END;
+                end
+                else if (calc_Ez_start_en_i)begin
+                    calc_Ez_flg_o = 1'b1;
+                    s_CS_n        = WAIT_CALC_END;
+                    end
+                else if (calc_src_start_en_i)begin
+                    calc_src_flg_o = 1'b1;
+                    s_CS_n         = WAIT_CALC_END;
+                end
+                else begin
+                    calc_Hy_flg_o = 1'b0;
+                    calc_Ez_flg_o = 1'b0;
+                    calc_src_flg_o = 1'b0;
+                    s_CS_n        = INIT_CALC_PROCESS;
+                end
+            end
+
+            WAIT_CALC_END:
+            begin
+                buffer_Ez_end_o= 1'b0;
+                buffer_src_end_o= 1'b0;
+                rd_Ez_sgl      = 1'b0;
+                rd_Hy_sgl      = 1'b0;
+                rd_src_sgl     = 1'b0;
+                if (wrt_Hy_start_i)begin
+                    s_w_data_store = 1'b1;
+                    s_CS_n         = INIT_WRITE_HY;
+                end
+                else if (wrt_Ez_start_i)begin
+                    s_w_data_store = 1'b1;
+                    s_CS_n         = INIT_WRITE_EZ;
+                end
+                else if (wrt_src_start_i)begin
+                    s_CS_n         = INIT_WRITE_SRC; 
+                end
+                else begin
+                    s_w_data_store = 1'b0;
+                    s_CS_n         = WAIT_CALC_END;
+                end
+            end
 	    
             INIT_WRITE_HY:
             begin
-		mem_rd_Hy_en_o = 1'b1;
-                s_CS_n    = WAIT_WRITE_HY;
-		wt_Hy_sgl = 1'b1;
+                mem_rd_Hy_en_o = 1'b1;
+                s_CS_n         = WAIT_WRITE_HY;
+                wt_Hy_sgl      = 1'b1;
             end
 
             WAIT_WRITE_HY:
-	    begin
-                s_w_req = 1'b1;
-		wt_Hy_sgl = 1'b1;
-		    if (r_word_size == 'd0)begin
-			mem_rd_end_o = 1'b1;
-                        s_CS_n = WAIT_0;
-		    end
-                    else if (nxt_buffer_en)
-                    begin
-			wt_Hy_sgl      = 1'b0;
-			buffer_Hy_start_o   = 1'b1;
-			mem_rd_Hy_en_o = 1'b0;
-			mem_rd_end_o   = 1'b1;
-                        s_CS_n         = INIT_READ_HY;
-                    end
-		    else 
-			s_CS_n = WAIT_WRITE_HY;
-            end
-	    WAIT_0:
-	    begin
-		    if (calc_Ez_start_en_i)
-			    s_CS_n = IDLE;
-		    else 
-			    s_CS_n = WAIT_0;
-	    end
-
-	    INIT_WRITE_EZ:
             begin
-		mem_rd_Ez_en_o = 1'b1;
-                s_CS_n    = WAIT_WRITE_EZ;
-		wt_Ez_sgl = 1'b1;
+                s_w_req   = 1'b1;
+                wt_Hy_sgl = 1'b1;
+                if (r_word_size == 'd0)begin
+                    mem_rd_end_o = 1'b1;
+                    s_CS_n       = WAIT_0;
+                end
+                else if (nxt_buffer_en)
+                begin
+                    wt_Hy_sgl      = 1'b0;
+                    buffer_Hy_start_o = 1'b1;
+                    mem_rd_Hy_en_o = 1'b0;
+                    mem_rd_end_o   = 1'b1;
+                    s_CS_n         = INIT_READ_HY;
+                end
+                else 
+                    s_CS_n = WAIT_WRITE_HY;
+            end
+
+            WAIT_0:
+            begin
+                if (calc_Ez_start_en_i)
+                    s_CS_n = IDLE;
+                else 
+                    s_CS_n = WAIT_0;
+            end
+
+            INIT_WRITE_EZ:
+            begin
+                mem_rd_Ez_en_o = 1'b1;
+                s_CS_n         = WAIT_WRITE_EZ;
+                wt_Ez_sgl      = 1'b1;
             end
 
             WAIT_WRITE_EZ:
-	    begin
-                s_w_req = 1'b1;
-		wt_Ez_sgl = 1'b1;
-		if (r_word_size == 'd0)begin
-			mem_rd_end_o   = 1'b1;
-                        s_CS_n = WAIT_1;
-		end
+            begin
+                s_w_req   = 1'b1;
+                wt_Ez_sgl = 1'b1;
+                if (r_word_size == 'd0)begin
+                    mem_rd_end_o = 1'b1;
+                    s_CS_n       = WAIT_1;
+                end
                 else if (nxt_buffer_en)
                 begin
-			wt_Ez_sgl      = 1'b0;
-  			buffer_Hy_start_o   = 1'b1;
-			mem_rd_Ez_en_o = 1'b0;
-			mem_rd_end_o   = 1'b1;
-                        s_CS_n         = INIT_READ_HY;
+                    wt_Ez_sgl      = 1'b0;
+                    buffer_Hy_start_o = 1'b1;
+                    mem_rd_Ez_en_o = 1'b0;
+                    mem_rd_end_o   = 1'b1;
+                    s_CS_n         = INIT_READ_HY;
                 end
-		else 
-                        s_CS_n = WAIT_WRITE_EZ;
+                else 
+                    s_CS_n = WAIT_WRITE_EZ;
             end
 
-	    WAIT_1:
-	    begin
-		   if (calc_src_start_en_i)
-			s_CS_n = INIT_READ_SRC;
-		   else 
-			s_CS_n = WAIT_1;
-	    end
-
-	    INIT_READ_SRC:
-	    begin
-		buffer_src_start_o= 1'b1;
-		s_CS_n		  = WAIT_READ_SRC;
-		rd_src_sgl        = 1'b1;    
-	    end
-
-	    WAIT_READ_SRC:
-	    begin
-                s_r_req           = 1'b1;
-		rd_src_sgl        = 1'b1;
-		if (~s_r_gnt)begin
-                    s_CS_n = WAIT_READ_SRC;
-		end
-		else if (s_r_gnt)
-		begin
-		    s_r_req           = 1'b0;
-		    buffer_src_start_o= 1'b0;
-		    buffer_src_end_o= 1'b1;
-                    s_CS_n         = INIT_CALC_PROCESS;
-                end
-            end
-
-   	    INIT_WRITE_SRC:
-    	    begin
- 		mem_rd_Ez_en_o = 1'b1;
-                s_CS_n    = WAIT_WRITE_SRC;
-		wt_src_sgl = 1'b1;
-            end
-
-	    WAIT_WRITE_SRC:
+            WAIT_1:
             begin
-	        s_w_req = 1'b1;
-		wt_src_sgl = 1'b1;
-		if (~s_w_gnt)begin
-		    mem_rd_end_o    = 1'b1;
-		    s_w_data_store  = 1'b1;
+                if (calc_src_start_en_i)
+                    s_CS_n = INIT_READ_SRC;
+                else 
+                    s_CS_n = WAIT_1;
+            end
+    
+            INIT_READ_SRC:
+            begin
+                buffer_src_start_o= 1'b1;
+                s_CS_n		      = WAIT_READ_SRC;
+                rd_src_sgl        = 1'b1;    
+            end
+    
+            WAIT_READ_SRC:
+            begin
+                s_r_req           = 1'b1;
+                rd_src_sgl        = 1'b1;
+                if (~s_r_gnt)begin
+                    s_CS_n = WAIT_READ_SRC;
+                end
+                else if (s_r_gnt)
+                begin
+                    s_r_req           = 1'b0;
+                    buffer_src_start_o= 1'b0;
+                    buffer_src_end_o  = 1'b1;
+                    s_CS_n            = INIT_CALC_PROCESS;
+                end
+            end
+    
+            INIT_WRITE_SRC:
+            begin
+                mem_rd_Ez_en_o = 1'b1;
+                s_CS_n         = WAIT_WRITE_SRC;
+                wt_src_sgl     = 1'b1;
+            end
+    
+            WAIT_WRITE_SRC:
+            begin
+                s_w_req = 1'b1;
+                wt_src_sgl = 1'b1;
+                if (~s_w_gnt)begin
+                    mem_rd_end_o    = 1'b1;
+                    s_w_data_store  = 1'b1;
                     s_CS_n = WAIT_WRITE_SRC;
-		end
+                end
                 else if(s_w_gnt)
                 begin
-			wt_src_sgl      = 1'b0;
-			mem_rd_Ez_en_o  = 1'b0;
-			mem_rd_end_o    = 1'b1;
-                        s_CS_n          = WAIT_2;
+                    wt_src_sgl      = 1'b0;
+                    mem_rd_Ez_en_o  = 1'b0;
+                    mem_rd_end_o    = 1'b1;
+                    s_CS_n          = WAIT_2;
                 end
             end
-            
-	    WAIT_2:
-	    begin
-		    if (calc_Hy_start_en_i)
-			s_CS_n          = IDLE;
-		    else 
-			s_CS_n          = WAIT_2;
-	    end
-
-            default:
+                
+            WAIT_2:
             begin
-                s_CS_n = IDLE;
+                if (calc_Hy_start_en_i)
+                    s_CS_n          = IDLE;
+                else 
+                    s_CS_n          = WAIT_2;
             end
+    
+            default:
+                begin
+                    s_CS_n = IDLE;
+                end
         endcase
     end
-//
-always_ff @(posedge ACLK,negedge ARESETn)begin
-	if (!ARESETn)
-		calc_Hy_end_flg = 1'b0;
-	else if (r_word_size == 'd0 && r_CS == WAIT_WRITE_HY)
-		calc_Hy_end_flg = 1'b1;
-	else if (calc_Hy_end_flg == 1'b1 && calc_Ez_start_en_i )
-		calc_Hy_end_flg = 1'b0;
-	else   
-	       	calc_Hy_end_flg = calc_Hy_end_flg;
-	end
-//
-always_ff @(posedge ACLK,negedge ARESETn)begin
-	if (!ARESETn)
-		calc_Ez_end_flg = 1'b0;
-	else if (r_word_size == 'd0 && r_CS == WAIT_WRITE_EZ)
-		calc_Ez_end_flg = 1'b1;
-	else if (calc_Ez_end_flg == 1'b1 && calc_src_start_en_i )
-		calc_Ez_end_flg = 1'b0;
-	else   
-	       	calc_Ez_end_flg = calc_Ez_end_flg;
-	end
-//
-always_ff @(posedge ACLK,negedge ARESETn)begin
-	if (!ARESETn)
-		calc_src_end_flg = 1'b0;
-	else if (s_CS_n == WAIT_2)
-		calc_src_end_flg = 1'b1;
-	else if (calc_src_end_flg == 1'b1 && calc_Hy_start_en_i )
-		calc_src_end_flg = 1'b0;
-	else   
-	       	calc_src_end_flg = calc_src_end_flg;
-	end
-
-//////////////////////////////////////
-//record number of read/writing data//
-//////////////////////////////////////
-always_ff @(posedge ACLK, negedge ARESETn)
-	begin
-		if (!ARESETn)
-			record_num_cnt <= 'd0;
-		else if (r_CS == WAIT_READ_HY)begin	
-			record_num_cnt <= (mstr.r_valid & mstr.r_ready)?(record_num_cnt + 1'b1) : record_num_cnt;
-		end
-		else if (r_CS == WAIT_READ_EZ)begin
-			record_num_cnt <= (mstr.r_valid & mstr.r_ready)?(record_num_cnt + 1'b1) : record_num_cnt;
-		end	
-		else if (r_CS == WAIT_WRITE_HY)begin
-			record_num_cnt <= (mstr.w_valid&mstr.w_ready)
-				?(record_num_cnt + 1'b1) : record_num_cnt;
-		end			
-		else if (r_CS == WAIT_WRITE_EZ)begin
-			record_num_cnt <= (mstr.w_valid&mstr.w_ready)
-				?(record_num_cnt + 1'b1) : record_num_cnt;
-		end
-		else 
-			record_num_cnt <= 'd0;
-	end                                       
-////////////////////////////////
-//mem read/write address////////
-////////////////////////////////
-always_ff @(posedge ACLK, negedge ARESETn)
-	begin
-		if (!ARESETn)begin
-		     	r_r_Hy_word_addr <= 'b0;
-            		r_r_Ez_word_addr <= 'b0;
-            		r_r_Ez_word_addr_0 <= 'b0;
-            		r_w_Hy_word_addr <= 'b0;
-            		r_w_Ez_word_addr <= 'b0;
-			r_word_size      <= 'b0;
-		end
-		else case(r_CS)
-		IDLE:
-		begin
-			r_r_Hy_word_addr <= Hy_addr_i[mstr.AXI_ADDR_WIDTH-1:2];
-            		r_r_Ez_word_addr <= Ez_addr_i[mstr.AXI_ADDR_WIDTH-1:2];
-            		r_r_Ez_word_addr_0 <= Ez_addr_i[mstr.AXI_ADDR_WIDTH-1:2]+1'b1;
-            		r_w_Hy_word_addr <= Hy_addr_i[mstr.AXI_ADDR_WIDTH-1:2];
-            		r_w_Ez_word_addr <= Ez_addr_i[mstr.AXI_ADDR_WIDTH-1:2]+1'b1;
-			r_word_size      <= size_i;
-		end
-
-		WAIT_READ_HY:
-		begin   if (buffer_Hy_last_1)
-			    r_r_Hy_word_addr <= r_r_Hy_word_addr -1'b1;
-			else 
-			r_r_Hy_word_addr <= (mstr.ar_valid && mstr.ar_ready)? (r_r_Hy_word_addr + 1'b1) : r_r_Hy_word_addr; 
-		end
-
-		WAIT_READ_EZ:
-		begin
-                        if (calc_Ez_start_en_i)begin 
-			    r_r_Ez_word_addr_0 <= (mstr.ar_valid && mstr.ar_ready)? (r_r_Ez_word_addr_0 + 1'b1) : r_r_Ez_word_addr_0;
-		        end	
-			if(buffer_Ez_last_0)
-			    r_r_Ez_word_addr <= r_r_Ez_word_addr - 1'b1;
-			else 
-			    r_r_Ez_word_addr <= (mstr.ar_valid && mstr.ar_ready)? (r_r_Ez_word_addr + 1'b1) : r_r_Ez_word_addr;
-		end
-
-		WAIT_WRITE_HY:
-		begin
-			r_w_Hy_word_addr <= (mstr.aw_valid && mstr.aw_ready)? (r_w_Hy_word_addr + 1'b1) : r_w_Hy_word_addr; 
-			r_word_size      <= (mstr.aw_valid && mstr.aw_ready)? (r_word_size - 1'b1) : r_word_size;
-		end
-
-		WAIT_WRITE_EZ:
-		begin
-			r_w_Ez_word_addr <= (mstr.aw_valid && mstr.aw_ready)? (r_w_Ez_word_addr + 1'b1) : r_w_Ez_word_addr; 
-			r_word_size      <= (mstr.aw_valid && mstr.aw_ready)? (r_word_size - 1'b1) : r_word_size;
-		end
-
-		INIT_READ_SRC:
-		begin
-			r_r_Ez_word_addr <= Ez_addr_i[mstr.AXI_ADDR_WIDTH-1:2];
-		end
-
-		INIT_WRITE_SRC:
-		begin
-			r_w_Ez_word_addr <= Ez_addr_i[mstr.AXI_ADDR_WIDTH-1:2];
-		end
-
-		default:begin
-			r_r_Hy_word_addr <= r_r_Hy_word_addr;
-            		r_r_Ez_word_addr <= r_r_Ez_word_addr;
-            		r_r_Ez_word_addr_0 <= r_r_Ez_word_addr_0;
-            		r_w_Hy_word_addr <= r_w_Hy_word_addr;
-            		r_w_Ez_word_addr <= r_w_Ez_word_addr;
-			r_word_size 	 <= r_word_size; 
-		end
-		endcase
-	 end
-///////////////////////
+    //
+    always_ff @(posedge ACLK,negedge ARESETn)begin
+        if (!ARESETn)
+            calc_Hy_end_flg = 1'b0;
+        else if (r_word_size == 'd0 && r_CS == WAIT_WRITE_HY)
+            calc_Hy_end_flg = 1'b1;
+        else if (calc_Hy_end_flg == 1'b1 && calc_Ez_start_en_i )
+            calc_Hy_end_flg = 1'b0;
+        else   
+            calc_Hy_end_flg = calc_Hy_end_flg;
+    end
+    //
+    always_ff @(posedge ACLK,negedge ARESETn)begin
+        if (!ARESETn)
+            calc_Ez_end_flg = 1'b0;
+        else if (r_word_size == 'd0 && r_CS == WAIT_WRITE_EZ)
+            calc_Ez_end_flg = 1'b1;
+        else if (calc_Ez_end_flg == 1'b1 && calc_src_start_en_i )
+            calc_Ez_end_flg = 1'b0;
+        else   
+            calc_Ez_end_flg = calc_Ez_end_flg;
+    end
+    //
+    always_ff @(posedge ACLK,negedge ARESETn)begin
+        if (!ARESETn)
+            calc_src_end_flg = 1'b0;
+        else if (s_CS_n == WAIT_2)
+            calc_src_end_flg = 1'b1;
+        else if (calc_src_end_flg == 1'b1 && calc_Hy_start_en_i )
+            calc_src_end_flg = 1'b0;
+        else   
+            calc_src_end_flg = calc_src_end_flg;
+    end
+    
+    //////////////////////////////////////
+    //record number of read/writing data//
+    //////////////////////////////////////
+    always_ff @(posedge ACLK, negedge ARESETn)
+        begin
+            if (!ARESETn)
+                record_num_cnt <= 'd0;
+            else if (r_CS == WAIT_READ_HY)begin	
+                record_num_cnt <= (mstr.r_valid & mstr.r_ready) ? (record_num_cnt + 1'b1) : record_num_cnt;
+            end
+            else if (r_CS == WAIT_READ_EZ)begin
+                record_num_cnt <= (mstr.r_valid & mstr.r_ready) ? (record_num_cnt + 1'b1) : record_num_cnt;
+            end	
+            else if (r_CS == WAIT_WRITE_HY)begin
+                record_num_cnt <= (mstr.w_valid & mstr.w_ready) ? (record_num_cnt + 1'b1) : record_num_cnt;
+            end			
+            else if (r_CS == WAIT_WRITE_EZ)begin
+                record_num_cnt <= (mstr.w_valid & mstr.w_ready) ? (record_num_cnt + 1'b1) : record_num_cnt;
+            end
+            else 
+                record_num_cnt <= 'd0;
+        end                                       
+    ////////////////////////////////
+    //mem read/write address////////
+    ////////////////////////////////
+    always_ff @(posedge ACLK, negedge ARESETn)
+        begin
+            if (!ARESETn)begin
+                r_r_Hy_word_addr <= 'b0;
+                r_r_Ez_word_addr <= 'b0;
+                r_r_Ez_word_addr_0 <= 'b0;
+                r_w_Hy_word_addr <= 'b0;
+                r_w_Ez_word_addr <= 'b0;
+                r_word_size      <= 'b0;
+            end
+            else case(r_CS)
+            IDLE:
+            begin
+                r_r_Hy_word_addr <= Hy_addr_i[mstr.AXI_ADDR_WIDTH-1:2];
+                r_r_Ez_word_addr <= Ez_addr_i[mstr.AXI_ADDR_WIDTH-1:2];
+                r_r_Ez_word_addr_0 <= Ez_addr_i[mstr.AXI_ADDR_WIDTH-1:2]+1'b1;
+                r_w_Hy_word_addr <= Hy_addr_i[mstr.AXI_ADDR_WIDTH-1:2];
+                r_w_Ez_word_addr <= Ez_addr_i[mstr.AXI_ADDR_WIDTH-1:2]+1'b1;
+                r_word_size      <= size_i;
+            end
+            
+            WAIT_READ_HY:
+            begin   
+                if (buffer_Hy_last_1)
+                    r_r_Hy_word_addr <= r_r_Hy_word_addr -1'b1;
+                else 
+                    r_r_Hy_word_addr <= (mstr.ar_valid && mstr.ar_ready)
+                                        ? (r_r_Hy_word_addr + 1'b1) : r_r_Hy_word_addr; 
+            end
+            
+            WAIT_READ_EZ:
+            begin
+                if (calc_Ez_start_en_i)begin 
+                    r_r_Ez_word_addr_0 <= (mstr.ar_valid && mstr.ar_ready) 
+                                        ? (r_r_Ez_word_addr_0 + 1'b1) : r_r_Ez_word_addr_0;
+                end	
+                if(buffer_Ez_last_0)
+                    r_r_Ez_word_addr <= r_r_Ez_word_addr - 1'b1;
+                else 
+                    r_r_Ez_word_addr <= (mstr.ar_valid && mstr.ar_ready)
+                                        ? (r_r_Ez_word_addr + 1'b1) : r_r_Ez_word_addr;
+            end
+            
+            WAIT_WRITE_HY:
+            begin
+                r_w_Hy_word_addr <= (mstr.aw_valid && mstr.aw_ready)
+                                        ? (r_w_Hy_word_addr + 1'b1) : r_w_Hy_word_addr; 
+                r_word_size      <= (mstr.aw_valid && mstr.aw_ready)
+                                        ? (r_word_size - 1'b1) : r_word_size;
+            end
+            
+            WAIT_WRITE_EZ:
+            begin
+                r_w_Ez_word_addr <= (mstr.aw_valid && mstr.aw_ready)
+                                        ? (r_w_Ez_word_addr + 1'b1) : r_w_Ez_word_addr; 
+                r_word_size      <= (mstr.aw_valid && mstr.aw_ready)
+                                        ? (r_word_size - 1'b1) : r_word_size;
+            end
+            
+            INIT_READ_SRC:
+            begin
+                r_r_Ez_word_addr <= Ez_addr_i[mstr.AXI_ADDR_WIDTH-1:2];
+            end
+            
+            INIT_WRITE_SRC:
+            begin
+                r_w_Ez_word_addr <= Ez_addr_i[mstr.AXI_ADDR_WIDTH-1:2];
+            end
+            
+            default:
+            begin
+                r_r_Hy_word_addr <= r_r_Hy_word_addr;
+                r_r_Ez_word_addr <= r_r_Ez_word_addr;
+                r_r_Ez_word_addr_0 <= r_r_Ez_word_addr_0;
+                r_w_Hy_word_addr <= r_w_Hy_word_addr;
+                r_w_Ez_word_addr <= r_w_Ez_word_addr;
+                r_word_size 	 <= r_word_size; 
+            end
+            endcase
+    end
+    ///////////////////////
     fdtd_mem_word_rd
     #(
         .AXI4_ADDR_WIDTH ( mstr.AXI_ADDR_WIDTH ),

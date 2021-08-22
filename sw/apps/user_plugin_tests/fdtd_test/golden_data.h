@@ -1,7 +1,15 @@
 //Here is the data of the sampled points after the iteration of multiple time steps
-//The first set of data is collected after 64bit double precision software calculation, the field source position is set at the 5th grid, and the time step iteration is 100.
-//The second set of data is collected after 64bit double precision software calculation, the field source position is set at the 40th grid, and the time step iteration is 100.
-//The third set of data is collected after 64bit double precision software calculation, the field source position is set at the 95th grid, and the time step iteration is 100.
+//The first set of data is collected after 64bit double precision software calculation, 
+//the field source position is set at the 5th grid, and the time step iteration is 100.
+//
+//The second set of data is collected after 64bit double precision software calculation, 
+//the field source position is set at the 40th grid, and the time step iteration is 100.
+//
+//The third set of data is collected after 64bit double precision software calculation, 
+//the field source position is set at the 95th grid, and the time step iteration is 100.
+#ifndef _FDTD_GOLDEN_DATA_
+#define _FDTD_GOLDEN_DATA_
+
 int check_data_v0[]={
     0x00000000,
     0x00000000,
@@ -309,5 +317,6 @@ int check_data_v2[]={
     0xFFFBA5D3,
     0xFFFBD423,
     0xFFFC133A
-
 };
+#endif
+

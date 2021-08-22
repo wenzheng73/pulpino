@@ -44,44 +44,44 @@ module fdtd_reg_ctrl
     parameter REG_SIZE_WIDTH = 16
 )
 (
-    input logic                           ACLK,
-    input logic                           ARESETn,
+    input logic                                     ACLK,
+    input logic                                     ARESETn,
 
-    AXI_BUS.Slave                         slv,
+    AXI_BUS.Slave                                   slv,
 
     //user defined signals -------------------------------
     //fdtd coefficients
-    output logic signed [slv.AXI_DATA_WIDTH - 1:0]  ceze   ,         
-    output logic signed [slv.AXI_DATA_WIDTH - 1:0]  cezhy   ,        
-    output logic signed [slv.AXI_DATA_WIDTH - 1:0]  cezj   ,
-    output logic signed [slv.AXI_DATA_WIDTH - 1:0]  chyh   ,
-    output logic signed [slv.AXI_DATA_WIDTH - 1:0]  chyez   ,
-    output logic signed [slv.AXI_DATA_WIDTH - 1:0]  coe0   ,
+    output logic signed [slv.AXI_DATA_WIDTH - 1:0]  ceze ,         
+    output logic signed [slv.AXI_DATA_WIDTH - 1:0]  cezhy,        
+    output logic signed [slv.AXI_DATA_WIDTH - 1:0]  cezj ,
+    output logic signed [slv.AXI_DATA_WIDTH - 1:0]  chyh ,
+    output logic signed [slv.AXI_DATA_WIDTH - 1:0]  chyez,
+    output logic signed [slv.AXI_DATA_WIDTH - 1:0]  coe0 ,
     output logic signed [slv.AXI_DATA_WIDTH - 1:0]  Jz   ,
 
     //start fdtd calc signal
-    output logic                             fdtd_start_signal_o,
+    output logic                                    fdtd_start_signal_o,
 
-    output logic 			     calc_Hy_start_en_o,
-    output logic 			     calc_Ez_start_en_o,
-    output logic 			     calc_src_start_en_o,
-    input  logic			     calc_Hy_end_flg_i,
-    input  logic			     calc_Ez_end_flg_i,
-    input  logic			     calc_src_end_flg_i,
+    output logic                                    calc_Hy_start_en_o,
+    output logic                                    calc_Ez_start_en_o,
+    output logic                                    calc_src_start_en_o,
+    input  logic                                    calc_Hy_end_flg_i,
+    input  logic                                    calc_Ez_end_flg_i,
+    input  logic                                    calc_src_end_flg_i,
     //
     //field value addr
-    output logic [slv.AXI_ADDR_WIDTH - 1:0]  Hy_addr_o,
-    output logic [slv.AXI_ADDR_WIDTH - 1:0]  Ez_addr_o,
+    output logic [slv.AXI_ADDR_WIDTH - 1:0]         Hy_addr_o,
+    output logic [slv.AXI_ADDR_WIDTH - 1:0]         Ez_addr_o,
 
     //user logic
     //
-    output logic [REG_SIZE_WIDTH - 1:0]      size_o       ,        // process byte number
-    output logic                             ctrl_int_en_o,        // interrupt enable output
-    output logic                             cmd_clr_int_pulse_o,  // clear int signal (pulse)
-    output logic                             cmd_trigger_pulse_o,  // trigger signal (pulse)
+    output logic [REG_SIZE_WIDTH - 1:0]             size_o       ,        // process byte number
+    output logic                                    ctrl_int_en_o,        // interrupt enable output
+    output logic                                    cmd_clr_int_pulse_o,  // clear int signal (pulse)
+    output logic                                    cmd_trigger_pulse_o,  // trigger signal (pulse)
 
-    input  logic                             status_busy_i,        // status busy
-    input  logic                             status_int_pending_i  // status int pending
+    input  logic                                    status_busy_i,        // status busy
+    input  logic                                    status_int_pending_i  // status int pending
 
 );
 
@@ -168,7 +168,7 @@ module fdtd_reg_ctrl
         .WVALID_i   ( slv.w_valid   ),
         .WREADY_o   ( slv.w_ready   ),
                                   
-	.BID_o      ( slv.b_id      ),
+        .BID_o      ( slv.b_id      ),
         .BRESP_o    ( slv.b_resp    ),
         .BVALID_o   ( slv.b_valid   ),
         .BUSER_o    ( slv.b_user    ),
@@ -189,23 +189,23 @@ module fdtd_reg_ctrl
         if (~ARESETn)
         begin
             ceze    <= 'b0;
-	    cezhy   <= 'b0;   
-	    cezj    <= 'b0;
-	    chyh    <= 'b0;
-	    chyez   <= 'b0;
-	    coe0    <= 'b0;
-	    Jz      <= 'b0;
+            cezhy   <= 'b0;   
+            cezj    <= 'b0;
+            chyh    <= 'b0;
+            chyez   <= 'b0;
+            coe0    <= 'b0;
+            Jz      <= 'b0;
 
             size_o        <= 'b0;
             ctrl_int_en_o <= 'b0;
 
-	    fdtd_start_signal_o <= 'b0;
+            fdtd_start_signal_o <= 'b0;
             calc_Hy_start_en_o <= 'b0;
             calc_Ez_start_en_o <= 'b0;
             calc_src_start_en_o <= 'b0;
-
-	    Hy_addr_o <= 'b0; 
-	    Ez_addr_o <= 'b0; 
+            
+            Hy_addr_o <= 'b0; 
+            Ez_addr_o <= 'b0; 
 
         end
         else if (s_write)
@@ -219,27 +219,27 @@ module fdtd_reg_ctrl
                          for (int i = 0; i < slv.AXI_STRB_WIDTH; i++)
                              if (s_wstrb[i])
                                  cezhy[(i * 8) +: 8] <= s_wdata[(i * 8) +: 8];	  
-	             `REG_CEZJ:
+                     `REG_CEZJ:
                          for (int i = 0; i < slv.AXI_STRB_WIDTH; i++)
                              if (s_wstrb[i])
                                  cezj[(i * 8) +: 8] <= s_wdata[(i * 8) +: 8];
-	             `REG_CHYH:
+                     `REG_CHYH:
                          for (int i = 0; i < slv.AXI_STRB_WIDTH; i++)
                              if (s_wstrb[i])
                                  chyh[(i * 8) +: 8] <= s_wdata[(i * 8) +: 8];
-	             `REG_CHYEZ:
+                     `REG_CHYEZ:
                          for (int i = 0; i < slv.AXI_STRB_WIDTH; i++)
                              if (s_wstrb[i])
                                  chyez[(i * 8) +: 8] <= s_wdata[(i * 8) +: 8];
-	             `REG_COE0:
+                     `REG_COE0:
                          for (int i = 0; i < slv.AXI_STRB_WIDTH; i++)
                              if (s_wstrb[i])
                                  coe0[(i * 8) +: 8] <= s_wdata[(i * 8) +: 8];
-		     `REG_SOURCE:
+                     `REG_SOURCE:
                          for (int i = 0; i < slv.AXI_STRB_WIDTH; i++)
                              if (s_wstrb[i])
                                  Jz[(i * 8) +: 8] <= s_wdata[(i * 8) +: 8];
-		     `REG_START_CALC_SGL:
+                     `REG_START_CALC_SGL:
                          if (s_wstrb[`FDTD_CALC_SIGNAL_BIT / 8])
                              fdtd_start_signal_o <= s_wdata[`FDTD_CALC_SIGNAL_BIT];
                      `REG_SIZE:
@@ -249,21 +249,21 @@ module fdtd_reg_ctrl
                      `REG_CTRL:
                          if (s_wstrb[`CTRL_INT_EN_BIT / 8])
                              ctrl_int_en_o <= s_wdata[`CTRL_INT_EN_BIT];
-		     `REG_HY_ADDR:
+                     `REG_HY_ADDR:
                          for (int i = 0; i < slv.AXI_STRB_WIDTH; i++)
                              if (s_wstrb[i])
                                  Hy_addr_o[(i * 8) +: 8] <= s_wdata[(i * 8) +: 8];
-	             `REG_EZ_ADDR:
+                     `REG_EZ_ADDR:
                          for (int i = 0; i < slv.AXI_STRB_WIDTH; i++)
                              if (s_wstrb[i])
                                  Ez_addr_o[(i * 8) +: 8] <= s_wdata[(i * 8) +: 8];
                      `REG_CALC_HY_SGL:
                          if (s_wstrb[`FDTD_CALC_SIGNAL_BIT / 8])
                              calc_Hy_start_en_o <= s_wdata[`FDTD_CALC_SIGNAL_BIT];
-		     `REG_CALC_EZ_SGL:
+                     `REG_CALC_EZ_SGL:
                          if (s_wstrb[`FDTD_CALC_SIGNAL_BIT / 8])
                              calc_Ez_start_en_o <= s_wdata[`FDTD_CALC_SIGNAL_BIT];
-		     `REG_CALC_SRC_SGL:
+                     `REG_CALC_SRC_SGL:
                          if (s_wstrb[`FDTD_CALC_SIGNAL_BIT / 8])
                              calc_src_start_en_o <= s_wdata[`FDTD_CALC_SIGNAL_BIT];     
                  endcase
@@ -330,11 +330,11 @@ module fdtd_reg_ctrl
     begin
         case (s_r_word_addr)
        	    `REG_CALC_HY_SGL:
-		s_rdata = {'h0,!calc_Hy_end_flg_i};
-	    `REG_CALC_EZ_SGL:
-		s_rdata = {'h0,!calc_Ez_end_flg_i};
-	    `REG_CALC_SRC_SGL:
-		s_rdata = {'h0,!calc_src_end_flg_i};
+                s_rdata = {'h0,!calc_Hy_end_flg_i};
+            `REG_CALC_EZ_SGL:
+                s_rdata = {'h0,!calc_Ez_end_flg_i};
+            `REG_CALC_SRC_SGL:
+                s_rdata = {'h0,!calc_src_end_flg_i};
             `REG_SIZE:
                 // SystemVerilog will resize to the correct size
                 s_rdata = {'h0, size_o};
