@@ -49,7 +49,7 @@ module user_plugin
         .int_o      ( apb_up_int_o        )
     );
 
-   /* axi_up axi_up_i
+    /*axi_up axi_up_i
     (
         .ACLK    ( clk_i        ),
         .ARESETn ( rst_n        ),

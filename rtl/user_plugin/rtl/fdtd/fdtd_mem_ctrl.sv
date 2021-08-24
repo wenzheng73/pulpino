@@ -218,7 +218,7 @@ module fdtd_mem_ctrl
         case (r_CS)
             IDLE:
             begin
-                status_busy_o = 1'b0;
+                //status_busy_o = 1'b0;
                 s_r_req       = 1'b0;
                 if (~fdtd_start_signal_i)begin
                     s_CS_n = IDLE;
@@ -429,15 +429,17 @@ module fdtd_mem_ctrl
                     mem_rd_Ez_en_o  = 1'b0;
                     mem_rd_end_o    = 1'b1;
                     s_CS_n          = WAIT_2;
+                    status_busy_o   = 1'b0;
                 end
             end
                 
             WAIT_2:
             begin
-                if (calc_Hy_start_en_i)
-                    s_CS_n          = IDLE;
+				if (calc_Hy_start_en_i)begin
+                    s_CS_n        = IDLE;
+                end
                 else 
-                    s_CS_n          = WAIT_2;
+                    s_CS_n        = WAIT_2;
             end
     
             default:

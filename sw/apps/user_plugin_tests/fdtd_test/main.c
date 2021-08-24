@@ -66,7 +66,7 @@ int Hy[GRID_SIZE+UNUSED_SIZE];
 int Ez[GRID_SIZE+UNUSED_SIZE];
 
 void initialize_field_space(int word_n){
-    printf("initialize problem space!!!\n");
+    printf("Initialize problem space!!!\n");
     for (size_t i = 0; i < sizeof(Hy)/sizeof(Hy[0]); ++i){
         Hy[i] = 0;
     }
@@ -83,7 +83,7 @@ void initialize_field_space(int word_n){
 
 void read_coefficient(){
     //    
-    printf("read relation coefficient!!!\n");
+    printf("Read the correlation coefficients!!!\n");
     //Assign values to the coefficient terms in the update process
     FDTD_CEZE  = coes[0];
     FDTD_CEZHY = coes[1];
@@ -152,14 +152,23 @@ void update_src_process(int src_position){
     FDTD_CALC_SRC_SGL = FDTD_CALC_CLR_BIT;
 }
 
-void update_field_process(int src_position){
-    //
+void update_field_process(int src_position, int* errors ){
+    //	
     FDTD_CALC_HY_SGL  = FDTD_CALC_CLR_BIT;
     FDTD_CALC_EZ_SGL  = FDTD_CALC_CLR_BIT;   
     FDTD_CALC_SRC_SGL = FDTD_CALC_CLR_BIT;
-    update_Hy_process (src_position-1);
+    //
+	update_Hy_process (src_position-1);
+	//
     update_Ez_process (src_position-1);
+	//
     update_src_process(src_position-1);
+	//
+    while (1) {
+        if (g_up_int_triggers != 0) {
+            break;
+        }
+    }   
 }
 
 //Set up observation points to collect data
@@ -206,25 +215,30 @@ void compare_observation_point_error(unsigned int number_of_time_steps, unsigned
 }
 
 //Iterative update process
-void run_fdtd_loop(unsigned int number_of_time_steps, int src_position){
+void run_fdtd_loop(unsigned int number_of_time_steps, int src_position, int* errors){
     FDTD_START_CALC_SGL = FDTD_CALC_CLR_BIT;
     printf("Having fdtd loop!!!\n");
     for (size_t i = 0; i < number_of_time_steps; ++i){
         //Start the entire iterative process
         printf("---------The current timestep is %d .---------\n",i+1);
-        
-        //load field source
+        //	
+	    g_up_int_triggers = 0;
+        mb();
+        // Enable interrupt
+        FDTD_CMD = FDTD_CMD_TRIGGER_BIT;
+        FDTD_CTRL = FDTD_CTRL_INT_EN_BIT; 
+		//load field source
         //The coefficients here are related to the actual project
         //The simplest way to join the field_source (point source) is implemented here
         load_field_source(i);
-        
+        //
         //trigger hardware's calculation of updating field_value
         FDTD_START_CALC_SGL = FDTD_CALC_TRIGGER_BIT;
-        
+        //
         //updating electromagnetic field
         //Set to PEC at the truncation boundary
-        //load field_source, such as sin function
-        update_field_process( src_position );
+        //load field_source, such as sinc function
+        update_field_process( src_position, errors);
         //
         FDTD_START_CALC_SGL = FDTD_CALC_CLR_BIT;
         //Perform data collection of observation points
@@ -237,26 +251,39 @@ void run_fdtd_loop(unsigned int number_of_time_steps, int src_position){
 }
 //
 void fdtd_solve(int grid_size, unsigned int number_of_time_steps, int src_position, unsigned int number_of_cases, int* errors){
-    //number of tests performed
+    //number of cases performed
     printf("----------------------------------------------------------\n");
     printf("-----------Having %dst test in progress!!! >_<------------\n",number_of_cases+1);
     printf("----------------------------------------------------------\n");
     //
-	g_up_int_triggers = 0;
-    mb();
-    // Enable interrupt
-    FDTD_CTRL = FDTD_CTRL_INT_EN_BIT;
+    // Make sure no irq pending
+    //
+    // Disable irq within user plugin peripherals.
+    FDTD_CTRL = 0;
+    // Clear pending int
+    FDTD_CMD = FDTD_CMD_CLR_INT_BIT;
+    //
+    // Global enable User plugin interrupt
+    //
+    // Clear all events
+    ECP = 0xFFFFFFFF;
+    // Clear all interrupts
+    ICP = 0xFFFFFFFF;
+    int_enable();
+    IER = IER | (1 << IRQ_UP_IDX); // Enable User plugin interrupt 
+
 	//define problem space size and initialize field space
     initialize_field_space(grid_size);
+	//
     //read field update equation's coefficients
     read_coefficient();
-    //set status
-    printf("set status!!!\n");
-    //
+	//
     //having iteration
-    run_fdtd_loop( number_of_time_steps, src_position);
+    run_fdtd_loop( number_of_time_steps, src_position, errors);
+	//
     //software's calculation result compare with hardware's
     compare_observation_point_error(number_of_time_steps,number_of_cases, errors);
+	//
     printf("----------------------------------------------------------\n");
     printf("-----------Finishing %dst test in progress!!! <_>---------\n",number_of_cases+1);
     printf("----------------------------------------------------------\n");
