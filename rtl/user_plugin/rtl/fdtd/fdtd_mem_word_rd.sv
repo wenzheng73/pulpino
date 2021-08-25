@@ -54,7 +54,6 @@ module fdtd_mem_word_rd
 );
 
 logic [AXI4_ADDR_WIDTH - 1: 0] s_r_addr;
-//logic [7:0]		               read_burst_cnt;
 // Extend word addr to byte addr
 assign s_r_addr =  {rd_word_addr_i,2'h0};
 ////////////////////
@@ -93,16 +92,6 @@ end
 //        state transfers have been accessed.
 //        Should use BFM to test the whole FSM.
 //
-/*always_ff @(posedge ACLK or negedge ARESETn)
-	begin
-		if (!ARESETn)
-			read_burst_cnt <= 'd0;
-		else if(read_burst_cnt == AXI4_ARLEN - 1'b1)
-			read_burst_cnt <= 'd0;
-		else
-			read_burst_cnt <=( ARREADY_i&&ARVALID_o )? (read_burst_cnt + 1'b1) : read_burst_cnt;
-	end*/	
-//
 always_comb
 begin
     ARVALID_o = 1'b0;
@@ -116,11 +105,11 @@ begin
             begin
                 ARVALID_o = 1'b1;
 
-		if (~ARREADY_i)
-			s_RS_n = RS_WAIT_ARREADY;
-		else 
-			s_RS_n = RS_WAIT_RLAST;
-
+            if (~ARREADY_i)
+            	s_RS_n = RS_WAIT_ARREADY;
+            else 
+            	s_RS_n = RS_WAIT_RLAST;
+            
             end
         end
 
@@ -128,10 +117,10 @@ begin
         begin
             ARVALID_o = 1'b1;
 
-		if (~ARREADY_i)
-			s_RS_n = RS_WAIT_ARREADY;
-		else 
-		        s_RS_n = RS_WAIT_RLAST;	
+            if (~ARREADY_i)
+            	s_RS_n = RS_WAIT_ARREADY;
+            else 
+                s_RS_n = RS_WAIT_RLAST;	
         end 
 
         RS_WAIT_RLAST:
