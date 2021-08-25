@@ -159,11 +159,9 @@ void update_field_process(int src_position, int* errors ){
     FDTD_CALC_SRC_SGL = FDTD_CALC_CLR_BIT;
     //
     update_Hy_process (src_position-1);
-	//
     update_Ez_process (src_position-1);
-	//
     update_src_process(src_position-1);
-	//
+    //
     while (1) {
         if (g_up_int_triggers != 0) {
             break;
