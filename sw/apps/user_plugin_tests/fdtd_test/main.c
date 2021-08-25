@@ -158,7 +158,7 @@ void update_field_process(int src_position, int* errors ){
     FDTD_CALC_EZ_SGL  = FDTD_CALC_CLR_BIT;   
     FDTD_CALC_SRC_SGL = FDTD_CALC_CLR_BIT;
     //
-	update_Hy_process (src_position-1);
+    update_Hy_process (src_position-1);
 	//
     update_Ez_process (src_position-1);
 	//
@@ -222,12 +222,12 @@ void run_fdtd_loop(unsigned int number_of_time_steps, int src_position, int* err
         //Start the entire iterative process
         printf("---------The current timestep is %d .---------\n",i+1);
         //	
-	    g_up_int_triggers = 0;
+        g_up_int_triggers = 0;
         mb();
         // Enable interrupt
         FDTD_CMD = FDTD_CMD_TRIGGER_BIT;
         FDTD_CTRL = FDTD_CTRL_INT_EN_BIT; 
-		//load field source
+        //load field source
         //The coefficients here are related to the actual project
         //The simplest way to join the field_source (point source) is implemented here
         load_field_source(i);
@@ -272,18 +272,18 @@ void fdtd_solve(int grid_size, unsigned int number_of_time_steps, int src_positi
     int_enable();
     IER = IER | (1 << IRQ_UP_IDX); // Enable User plugin interrupt 
 
-	//define problem space size and initialize field space
+    //define problem space size and initialize field space
     initialize_field_space(grid_size);
-	//
+    //
     //read field update equation's coefficients
     read_coefficient();
-	//
+    //
     //having iteration
     run_fdtd_loop( number_of_time_steps, src_position, errors);
-	//
+    //
     //software's calculation result compare with hardware's
     compare_observation_point_error(number_of_time_steps,number_of_cases, errors);
-	//
+    //
     printf("----------------------------------------------------------\n");
     printf("-----------Finishing %dst test in progress!!! <_>---------\n",number_of_cases+1);
     printf("----------------------------------------------------------\n");
