@@ -161,11 +161,11 @@ module fdtd_mem_ctrl
     assign Hy_old_o          = rd_Hy_sgl ? s_r_data : 'd0;
     assign Ez_old_o          = (rd_Ez_sgl||rd_src_sgl) ? s_r_data : 'd0;
     //
-    assign buffer_Hy_last_0  = calc_Hy_start_en_i ? ((record_num_cnt == BUFFER_SIZE) && rd_Hy_sgl) : 1'b0;
-    assign buffer_Hy_last_1  = calc_Ez_start_en_i ? ((record_num_cnt == BUFFER_SIZE+1'b1) && rd_Hy_sgl) : 1'b0;
+    assign buffer_Hy_last_0  = calc_Hy_start_en_i ? ((record_num_cnt == BUFFER_SIZE-1'b1) && rd_Hy_sgl) : 1'b0;
+    assign buffer_Hy_last_1  = calc_Ez_start_en_i ? ((record_num_cnt == BUFFER_SIZE) && rd_Hy_sgl) : 1'b0;
 
-    assign buffer_Ez_last_0  = calc_Hy_start_en_i ? ((record_num_cnt == BUFFER_SIZE+1'b1) && rd_Ez_sgl) : 1'b0; 
-    assign buffer_Ez_last_1  = calc_Ez_start_en_i ? ((record_num_cnt == BUFFER_SIZE) && rd_Ez_sgl) : 1'b0;
+    assign buffer_Ez_last_0  = calc_Hy_start_en_i ? ((record_num_cnt == BUFFER_SIZE) && rd_Ez_sgl) : 1'b0; 
+    assign buffer_Ez_last_1  = calc_Ez_start_en_i ? ((record_num_cnt == BUFFER_SIZE-1'b1) && rd_Ez_sgl) : 1'b0;
 
     assign nxt_buffer_en     = ((record_num_cnt == BUFFER_SIZE) && (r_CS == WAIT_WRITE_HY || r_CS == WAIT_WRITE_EZ))
 	                           ? 1'b1:1'b0;   
