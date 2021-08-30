@@ -325,21 +325,7 @@ module fdtd_mem_ctrl
             WAIT_WRITE_HY:
             begin
                 wt_Hy_sgl = 1'b1;
-                //if (r_word_size == 'd0&&s_w_gnt)begin
-                /*if (r_word_size == 'd0&&s_w_gnt)begin
-                    mem_rd_end_o = 1'b1;
-                    s_CS_n       = WAIT_0;
-                end
-                else if (nxt_buffer_en)
-                begin
-                    wt_Hy_sgl      = 1'b0;
-                    buffer_Hy_start_o = 1'b1;
-                    mem_rd_Hy_en_o = 1'b0;
-                    mem_rd_end_o   = 1'b1;
-                    s_CS_n         = INIT_READ_HY;
-                end
-                else 
-                    s_CS_n = WAIT_WRITE_HY;*/
+                
                 if (~s_w_gnt)begin
                     s_CS_n = WAIT_WRITE_HY; 
                 end
@@ -379,20 +365,7 @@ module fdtd_mem_ctrl
             WAIT_WRITE_EZ:
             begin
                 wt_Ez_sgl = 1'b1;
-                /*if (r_word_size == 'd0&&s_w_gnt)begin
-                    mem_rd_end_o = 1'b1;
-                    s_CS_n       = WAIT_1;
-                end
-                else if (nxt_buffer_en)
-                begin
-                    wt_Ez_sgl      = 1'b0;
-                    buffer_Hy_start_o = 1'b1;
-                    mem_rd_Ez_en_o = 1'b0;
-                    mem_rd_end_o   = 1'b1;
-                    s_CS_n         = INIT_READ_HY;
-                end
-                else 
-                    s_CS_n = WAIT_WRITE_EZ;*/
+                
                 if (~s_w_gnt)begin
                     s_CS_n = WAIT_WRITE_EZ; 
                 end
