@@ -614,7 +614,7 @@ module fdtd_mem_ctrl
             begin
                 if (calc_Ez_start_en_i)begin 
                     r_r_Ez_word_addr_0 <= (mstr.ar_valid && mstr.ar_ready) 
-                                        ? (r_r_Ez_word_addr_0 + 'd4 ) : r_r_Ez_word_addr_0;
+                                        ? (r_r_Ez_word_addr_0 + burst_size_byte ) : r_r_Ez_word_addr_0;
                 end	
                 if(buffer_Ez_last_0)
                     r_r_Ez_word_addr <= r_r_Ez_word_addr - 'd4;
