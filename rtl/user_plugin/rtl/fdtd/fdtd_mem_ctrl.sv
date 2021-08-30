@@ -590,21 +590,21 @@ module fdtd_mem_ctrl
                 r_w_Ez_word_addr <= 'b0;
                 r_word_size      <= 'b0;
             end
-            else case(s_CS_n)
+            else case(r_CS)
             IDLE:
             begin
                 r_r_Hy_word_addr <= Hy_addr_i[mstr.AXI_ADDR_WIDTH-1:0];
                 r_r_Ez_word_addr <= Ez_addr_i[mstr.AXI_ADDR_WIDTH-1:0];
-                r_r_Ez_word_addr_0 <= Ez_addr_i[mstr.AXI_ADDR_WIDTH-1:0]+1'b1;
+                r_r_Ez_word_addr_0 <= Ez_addr_i[mstr.AXI_ADDR_WIDTH-1:0] + 'd4;
                 r_w_Hy_word_addr <= Hy_addr_i[mstr.AXI_ADDR_WIDTH-1:0];
-                r_w_Ez_word_addr <= Ez_addr_i[mstr.AXI_ADDR_WIDTH-1:0]+1'b1;
+                r_w_Ez_word_addr <= Ez_addr_i[mstr.AXI_ADDR_WIDTH-1:0] + 'd4;
                 r_word_size      <= size_i;
             end
             
             WAIT_READ_HY:
             begin   
                 if (buffer_Hy_last_1)
-                    r_r_Hy_word_addr <= r_r_Hy_word_addr -1'b1;
+                    r_r_Hy_word_addr <= r_r_Hy_word_addr - 'd4;
                 else 
                     r_r_Hy_word_addr <= (mstr.ar_valid && mstr.ar_ready)
                                         ? (r_r_Hy_word_addr + burst_size_byte) : r_r_Hy_word_addr; 
@@ -614,10 +614,10 @@ module fdtd_mem_ctrl
             begin
                 if (calc_Ez_start_en_i)begin 
                     r_r_Ez_word_addr_0 <= (mstr.ar_valid && mstr.ar_ready) 
-                                        ? (r_r_Ez_word_addr_0 + 1'b1 ) : r_r_Ez_word_addr_0;
+                                        ? (r_r_Ez_word_addr_0 + 'd4 ) : r_r_Ez_word_addr_0;
                 end	
                 if(buffer_Ez_last_0)
-                    r_r_Ez_word_addr <= r_r_Ez_word_addr - 1'b1;
+                    r_r_Ez_word_addr <= r_r_Ez_word_addr - 'd4;
                 else 
                     r_r_Ez_word_addr <= (mstr.ar_valid && mstr.ar_ready)
                                         ? (r_r_Ez_word_addr + burst_size_byte) : r_r_Ez_word_addr;
