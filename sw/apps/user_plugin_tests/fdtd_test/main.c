@@ -126,6 +126,9 @@ void update_Ez_process(int src_position){
             break;
         }	
     }
+    //To fix a bug in the hardware,a forced assignment at this location
+    //fixme:follow up on the bug fix for this location
+    Ez[GRID_SIZE] = 0x00000000;
     printf("this position's Ez field_value is: Ez[%d] = %d, Ez[%d] = %d, Ez[%d] = %d, Ez[%d] = %d .\n",
             1,Ez[1],
             src_position, Ez[src_position],
