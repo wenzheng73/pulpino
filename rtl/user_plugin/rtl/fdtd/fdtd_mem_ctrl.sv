@@ -443,7 +443,7 @@ module fdtd_mem_ctrl
                 
             WAIT_2:
             begin
-				if (calc_Hy_start_en_i)begin
+                if (calc_Hy_start_en_i)begin
                     s_CS_n = IDLE;
                 end
                 else 
