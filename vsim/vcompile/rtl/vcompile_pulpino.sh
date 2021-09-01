@@ -101,9 +101,15 @@ set SOURCED="${PROCESS_DIR}/vcompile.csh"
 source "$SOURCED"
 
 # chip-top
-vlog -quiet -sv -work ${LIB_PATH} +incdir+${RTL_PATH}/includes ${ASIC_DEFINES} ${CORE_DEFINES} ${RTL_PATH}/chip_top/pulpino_top_wrapper.sv   || goto error
-vlog -quiet -sv -work ${LIB_PATH} +incdir+${RTL_PATH}/includes ${ASIC_DEFINES} ${CORE_DEFINES} ${RTL_PATH}/chip_top/pulpino_pads.sv          || goto error
-vlog -quiet -sv -work ${LIB_PATH} +incdir+${RTL_PATH}/includes ${ASIC_DEFINES} ${CORE_DEFINES} ${RTL_PATH}/chip_top/pulpino_top_with_pads.sv || goto error
+echo "Compiling Process Specific Chip Top ..."
+set PROCESS_CHIP_TOP_DIR="${RTL_PATH}/chip_top"
+if ( $?ICB_PATH && "$ICB_PATH" != "" && -d "${ICB_PATH}/rtl/chip_top/${PROCESS}" ) then
+  # Use common chip top
+  set PROCESS_CHIP_TOP_DIR="${ICB_PATH}/rtl/chip_top/${PROCESS}"
+endif
+vlog -quiet -sv -work ${LIB_PATH} +incdir+${RTL_PATH}/includes ${ASIC_DEFINES} ${CORE_DEFINES} ${PROCESS_CHIP_TOP_DIR}/pulpino_top_wrapper.sv   || goto error
+vlog -quiet -sv -work ${LIB_PATH} +incdir+${RTL_PATH}/includes ${ASIC_DEFINES} ${CORE_DEFINES} ${PROCESS_CHIP_TOP_DIR}/pulpino_pads.sv          || goto error
+vlog -quiet -sv -work ${LIB_PATH} +incdir+${RTL_PATH}/includes ${ASIC_DEFINES} ${CORE_DEFINES} ${PROCESS_CHIP_TOP_DIR}/pulpino_top_with_pads.sv || goto error
 
 
 #

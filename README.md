@@ -83,6 +83,12 @@ specified in there. You can choose specific commits, tags or branches.
 If only PULPino repository is forked, to clone/update subrepositories in the forked repository, use
 
 ```sh
+./update-ips.py git@github.com:icb-platform
+```
+
+or
+
+```sh
 ./update-ips.py https://github.com/icb-platform
 ```
 

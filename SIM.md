@@ -12,11 +12,11 @@ cd pulpino
 mkdir build
 ```
 
-Link the `sw/cmake-configure.gcc.sh` in the build directory.
+Link the `sw/cmake_configure.gcc.sh` in the build directory.
 
 ```sh
 cd build
-ln -s ../sw/cmake-configure.gcc.sh .
+ln -s ../sw/cmake_configure.gcc.sh .
 ```
 
 ## Setup Environment
@@ -30,10 +30,10 @@ To let the configure script find tools
 
 ## Configure
 
-Modify the `cmake-configure.gcc.sh` to your needs and execute it inside the build directory.
+Modify the `cmake_configure.gcc.sh` to your needs and execute it inside the build directory.
 This will setup everything to perform simulations using ModelSim.
 
-`cmake-configure.gcc.sh` options
+`cmake_configure.gcc.sh` options
 
 1. `--core` option
 
@@ -74,7 +74,7 @@ E.g. To use `zeroriscy` cpu core, and let testbentch load firmware through SPI s
 Inside the `build` directory, execute
 
 ```sh
-./cmake-configure.gcc.sh --core zeroriscy --memload SPI
+./cmake_configure.gcc.sh --core zeroriscy --memload SPI
 ```
 
 

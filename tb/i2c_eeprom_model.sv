@@ -220,6 +220,12 @@ module i2c_model_phy
 
   //---------------------------------------------------------------------------
   // single-edge triggered register for output
+  initial begin
+    // Let sda_oe be zero at the very beginning of simulation.
+    // Otherwise, 'bus conflict' error at time zero may be report by PAD library.
+    sda_oe = 1'b0;
+  end
+
   always_ff @(negedge scl_in, negedge rst_ni)
   begin
     if (~rst_ni)

@@ -87,4 +87,4 @@ ipdb = ipstools.IPDatabase(ips_dir="./ips", skip_scripts=True)
 ipdb.update_ips(remote = remote)
 
 # launch generate-ips.py
-execute("./generate-scripts.py")
+execute("python2 generate-scripts.py")
