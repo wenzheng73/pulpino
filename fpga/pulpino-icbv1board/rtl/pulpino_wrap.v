@@ -14,6 +14,7 @@ module pulpino(
 
   fetch_enable_n,
 
+  spi_clk_i,
   spi_cs_i,
   spi_mode_o,
   spi_sdo0_o,
@@ -69,7 +70,7 @@ module pulpino(
 
   input         fetch_enable_n;
 
-  
+  input         spi_clk_i;
   input         spi_cs_i;
   output  [1:0] spi_mode_o;
   output        spi_sdo0_o;
@@ -121,41 +122,48 @@ module pulpino(
   input  tdi_i;
   output tdo_o;
 
-  parameter USE_ZERO_RISCY = 0;
+  parameter USE_ZERO_RISCY = 1;
   parameter RISCY_RV32F = 0;
-  parameter ZERO_RV32M = 0;
+  parameter ZERO_RV32M = 1;
   parameter ZERO_RV32E = 0;
    
   wire  [31:0] gpio_in;
   wire  [31:0] gpio_dir;
-  wire [31:0]  gpio_out_r;
-  wire         spi_clk_i;
+  wire  [31:0] gpio_out_r;
+  
   reg          usr_clk;
-  reg  [25:0]  cnt ;
+  reg   [25:0] cnt ;
   reg   [3:0]  usr_cnt;
   
-  assign spi_clk_i = clk;
   assign gpio_out[2:0] = gpio_out_r[2:0];
   assign gpio_out[3] = (cnt < 26'd2500_0000) ? 1'b1 : 1'b0 ;
-always @ (posedge clk) begin
-    if(0)
-        cnt <= 26'd0;
-    else if(cnt < 26'd5000_0000)
-        cnt <= cnt + 1'b1;
-    else
-        cnt <= 26'd0;
-end
+  always @ (posedge clk or negedge rst_n) begin
+  if(!rst_n)
+    cnt <= 26'd0;
+  else if(cnt < 26'd5000_0000)
+    cnt <= cnt + 1'b1;
+  else
+    cnt <= 26'd0;
+  end
 
-always @ (posedge clk) begin
-    if(!rst_n)
-        usr_cnt <= 4'd0;
-    else if(usr_cnt < 4'd4)
-        usr_cnt <= usr_cnt + 1'b1;
-    else begin
-        usr_cnt <= 4'd0;
-        usr_clk <= ~usr_clk;
-        end
-end
+  reg [3:0] counter;
+  always@(posedge clk or negedge rst_n) begin
+  if(!rst_n)
+    counter <= 4'd0;
+  else if(counter==4'd4)
+    counter <= 4'd0;
+  else
+    counter <= counter + 1'd1;
+  end
+
+  always@(posedge clk or negedge rst_n) begin
+  if(!rst_n)
+    usr_clk <= 4'd0;
+  else if(counter==4'd4)
+    usr_clk <= ~usr_clk;
+  else
+    usr_clk <= usr_clk;
+  end
 
   // PULP SoC
   pulpino_top
@@ -167,17 +175,17 @@ end
   )
   pulpino_i
   (
-    .clk               ( usr_clk               ),
+    .clk               ( usr_clk           ),//5MHz
     .rst_n             ( rst_n             ),
 
     .clk_sel_i         ( 1'b0              ),
     .clk_standalone_i  ( 1'b0              ),
 
     .testmode_i        ( 1'b0              ),
-    .fetch_enable_i    ( ~fetch_enable_n    ),
+    .fetch_enable_i    ( ~fetch_enable_n   ),
     .scan_enable_i     ( 1'b0              ),
 
-    .spi_clk_i         ( spi_clk_i         ),
+    .spi_clk_i         ( spi_clk_i         ), 
     .spi_cs_i          ( spi_cs_i          ),
     .spi_mode_o        ( spi_mode_o        ),
     .spi_sdo0_o        ( spi_sdo0_o        ),
@@ -219,7 +227,7 @@ end
     .sda_padoen_o      ( sda_oen_o         ),
 
     .gpio_in           ( gpio_in           ),
-    .gpio_out          ( gpio_out_r          ),
+    .gpio_out          ( gpio_out_r        ),
     .gpio_dir          ( gpio_dir          ),
     .gpio_padcfg       (                   ),
 
