@@ -8,7 +8,7 @@ if { ![info exists ::env(USE_ZERO_RISCY)] } {
 set NAME "ZERO_RISCY"
 
 # create project
-create_project pulpino . -part $::env(XILINX_PART)
+create_project -force pulpino . -part $::env(XILINX_PART)
 #set_property board $::env(XILINX_BOARD) [current_project]
 
 source tcl/ips_inc_dirs.tcl
