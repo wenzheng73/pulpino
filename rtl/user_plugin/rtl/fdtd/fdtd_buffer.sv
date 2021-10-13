@@ -29,14 +29,14 @@ module fdtd_buffer
 	input  logic                            rd_Ez_old_en_i,
 	input  logic  [BUFFER_ADDR_WIDTH-1:0]   rd_Hy_old_addr_i,
 	input  logic  [BUFFER_ADDR_WIDTH-1:0]   rd_Ez_old_addr_i,
-	output logic  [FDTD_DATA_WIDTH-1:0]	    Hy_old_o,	
-	output logic  [FDTD_DATA_WIDTH-1:0]	    Ez_old_o,
+	output logic  [FDTD_DATA_WIDTH-1:0]     Hy_old_o,	
+	output logic  [FDTD_DATA_WIDTH-1:0]     Ez_old_o,
 	//buffer field_value of current timestep
 	input  logic                            wrt_Hy_n_en_i,
 	input  logic                            wrt_Ez_n_en_i,
 	input  logic  [BUFFER_ADDR_WIDTH-1:0]   wrt_Hy_n_addr_i,	
 	input  logic  [BUFFER_ADDR_WIDTH-1:0]   wrt_Ez_n_addr_i,	
-	input  logic  [FDTD_DATA_WIDTH-1:0]	    Hy_n_i,	
+	input  logic  [FDTD_DATA_WIDTH-1:0]     Hy_n_i,	
 	input  logic  [FDTD_DATA_WIDTH-1:0]     Ez_n_i,	
 	//save field_value of current timestep to data_memory
 	//ram_buffer -> data_mem
@@ -44,8 +44,8 @@ module fdtd_buffer
 	input  logic                            mem_rd_Ez_en_i,
 	input  logic                            mem_rd_end_i,
 	input  logic                            wrtvalid_sgl_i,
-	output logic  [FDTD_DATA_WIDTH-1:0]	    Hy_n_o,	
-	output logic  [FDTD_DATA_WIDTH-1:0]	    Ez_n_o	
+	output logic  [FDTD_DATA_WIDTH-1:0]     Hy_n_o,	
+	output logic  [FDTD_DATA_WIDTH-1:0]     Ez_n_o	
 );
   //
   logic  [BUFFER_ADDR_WIDTH-1:0]  wrtaddr_Hy_old;
@@ -69,7 +69,7 @@ module fdtd_buffer
       WAIT0,
       WRT_HY_TO_DM,	
       WRT_EZ_TO_DM	
-  	} BFR_CS;
+      } BFR_CS;
   //
   assign  en = 1'b1;
   //
@@ -183,7 +183,7 @@ module fdtd_buffer
          default:BFR_CS <= IDLE;
          endcase
          end
-  	end
+      end
   //Hy field_value data of previous timestep
   fdtd_ram  
       #( .FDTD_DATA_WIDTH   ( FDTD_DATA_WIDTH   ),

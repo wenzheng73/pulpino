@@ -142,8 +142,8 @@ module fdtd_acc
             .wrt_Hy_n_en_o     ( wrt_Hy_n_en       ),
             .wrt_Ez_n_en_o     ( wrt_Ez_n_en       ),
             //calculation signal
-            .calc_Hy_en_o      ( calc_Hy_en	       ),
-            .calc_Ez_en_o      ( calc_Ez_en	       ),
+            .calc_Hy_en_o      ( calc_Hy_en        ),
+            .calc_Ez_en_o      ( calc_Ez_en        ),
             .calc_src_en_o     ( calc_src_en       ),
             .rd_Hy_old_addr_o  ( rd_Hy_old_addr    ),
             .rd_Ez_old_addr_o  ( rd_Ez_old_addr    ),
@@ -175,7 +175,7 @@ module fdtd_acc
             .chyez             ( chyez             ),
             .coe0              ( coe0              ),
             //
-            .Jz                ( Jz        	       ),
+            .Jz                ( Jz                ),
             //
             .Hy_old_i          ( Hy_old	           ),
             .Ez_old_i          ( Ez_old	           ),

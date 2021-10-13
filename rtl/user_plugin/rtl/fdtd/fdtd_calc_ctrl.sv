@@ -72,7 +72,7 @@ module fdtd_calc_ctrl
          WAIT_EZ_END,
          LOAD_SRC,
          WAIT_SRC_END
-  		} CS_CALC,NS_CALC;
+      } CS_CALC,NS_CALC;
   //
   assign  calc_Hy_end_flg  = (calc_num_cnt == BUFFER_SIZE-1'b1) ? 1'b1 :1'b0;
   assign  calc_Ez_end_flg  = (calc_num_cnt == BUFFER_SIZE-1'b1) ? 1'b1 :1'b0;
@@ -105,7 +105,7 @@ module fdtd_calc_ctrl
   //
   always_comb
   	begin	
-  		case (CS_CALC)
+    case (CS_CALC)
         IDLE:	
         begin   
             if (calc_Hy_flg_i)
@@ -229,27 +229,27 @@ module fdtd_calc_ctrl
               end
           WAIT_HY_END:
               begin
-          	      wrt_Hy_start <= 1'b1; wrt_Ez_start <= 1'b0; wrt_src_start <= 1'b0;
+                  wrt_Hy_start <= 1'b1; wrt_Ez_start <= 1'b0; wrt_src_start <= 1'b0;
               end
           CALC_EZ:
               begin
-          	      wrt_Hy_start <= 1'b0; wrt_Ez_start <= 1'b0; wrt_src_start <= 1'b0;
+                  wrt_Hy_start <= 1'b0; wrt_Ez_start <= 1'b0; wrt_src_start <= 1'b0;
               end
           WAIT_EZ_END:
               begin
-          	      wrt_Hy_start <= 1'b0; wrt_Ez_start <= 1'b1; wrt_src_start <= 1'b0;
+                  wrt_Hy_start <= 1'b0; wrt_Ez_start <= 1'b1; wrt_src_start <= 1'b0;
               end
           LOAD_SRC:
               begin
-          	      wrt_Hy_start <= 1'b0; wrt_Ez_start <= 1'b0; wrt_src_start <= 1'b0;
+                  wrt_Hy_start <= 1'b0; wrt_Ez_start <= 1'b0; wrt_src_start <= 1'b0;
               end
           WAIT_SRC_END:
               begin
-          	      wrt_Hy_start <= 1'b0; wrt_Ez_start <= 1'b0; wrt_src_start <= 1'b1;
+                  wrt_Hy_start <= 1'b0; wrt_Ez_start <= 1'b0; wrt_src_start <= 1'b1;
               end
           default:
               begin
-          	      wrt_Hy_start <= 1'b0; wrt_Ez_start <= 1'b0; wrt_src_start <= 1'b0;
+                  wrt_Hy_start <= 1'b0; wrt_Ez_start <= 1'b0; wrt_src_start <= 1'b0;
               end
           endcase
   	end
@@ -411,7 +411,7 @@ module fdtd_calc_ctrl
               wrt_Ez_n_en_r2 <= wrt_Ez_n_en_r1;
               wrt_Ez_n_en_r3 <= wrt_Ez_n_en_r2;
               wrt_Ez_n_en    <= wrt_Ez_n_en_r3;
-  		  end
+          end
   	end 
   //--------generate Hy's reading address of RAM--------------//
   logic [BUFFER_ADDR_WIDTH-1:0] rd_Hy_old_addr_r0;
@@ -437,7 +437,7 @@ module fdtd_calc_ctrl
               rd_Hy_old_addr <= 'd0;
               rd_Hy_old_addr_r0 <= 'd0;
           end
-  	end
+      end
   //--------generate Ez's reading address of RAM--------------//
   logic [BUFFER_ADDR_WIDTH-1:0] rd_Ez_old_addr_r0;
   //
@@ -464,7 +464,7 @@ module fdtd_calc_ctrl
               rd_Ez_old_addr <= 'd0;
               rd_Ez_old_addr_r0 <= 'd0;
           end
-  	end
+      end
   //---------------delay address of writing-------------------//
   always_ff @(posedge CLK, negedge RST_N )
       begin
@@ -474,7 +474,7 @@ module fdtd_calc_ctrl
           else begin
               wrt_Hy_n_addr <= wrt_Hy_n_en ? (wrt_Hy_n_addr + 1'b1) : 1'b0;	
           end
-  	  end
+      end
   //
   always_ff @(posedge CLK, negedge RST_N )
       begin
@@ -484,6 +484,6 @@ module fdtd_calc_ctrl
           else begin
               wrt_Ez_n_addr <= wrt_Ez_n_en ? (wrt_Ez_n_addr + 1'b1) : 1'b0;	
           end
-  	  end
+      end
   //	
    endmodule
