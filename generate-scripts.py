@@ -50,12 +50,15 @@ ipdb.generate_vcompile_libs_csh("vsim/vcompile/vcompile_ips.csh")
 
 # generate Vivado compilation scripts
 ipdb.export_vivado(script_path="fpga/pulpino-icbv1board/pulpino/tcl/ips_src_files.tcl", alternatives=['riscv'])
+ipdb.export_vivado(script_path="fpga/pulpino-icbv1board-2019/pulpino/tcl/ips_src_files.tcl", alternatives=['riscv'])
 ipdb.export_vivado(script_path="fpga/pulpino-zedboard/pulpino/tcl/ips_src_files.tcl", alternatives=['riscv'])
 # generate Vivado add_files.tcl
 ipdb.generate_vivado_add_files("fpga/pulpino-icbv1board/pulpino/tcl/ips_add_files.tcl", alternatives=['riscv'])
+ipdb.generate_vivado_add_files("fpga/pulpino-icbv1board-2019/pulpino/tcl/ips_add_files.tcl", alternatives=['riscv'])
 ipdb.generate_vivado_add_files("fpga/pulpino-zedboard/pulpino/tcl/ips_add_files.tcl", alternatives=['riscv'])
 # generate Vivado inc_dirs.tcl
 ipdb.generate_vivado_inc_dirs("fpga/pulpino-icbv1board/pulpino/tcl/ips_inc_dirs.tcl", alternatives=['riscv'])
+ipdb.generate_vivado_inc_dirs("fpga/pulpino-icbv1board-2019/pulpino/tcl/ips_inc_dirs.tcl", alternatives=['riscv'])
 ipdb.generate_vivado_inc_dirs("fpga/pulpino-zedboard/pulpino/tcl/ips_inc_dirs.tcl", alternatives=['riscv'])
 
 # generate verilator compilation scripts

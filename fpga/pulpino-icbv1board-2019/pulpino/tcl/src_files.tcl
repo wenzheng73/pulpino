@@ -58,7 +58,7 @@ set SRC_PULPINO " \
    $RTL/ram_mux.sv \
    $RTL/pulpino_top.sv \
    $RTL/clk_rst_gen.sv \
-   $FPGA_RTL/pulpino_wrap.v \
+   $FPGA_RTL/pulpino_wrap.sv \
 "
 
 # user_plugin
