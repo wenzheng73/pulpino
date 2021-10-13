@@ -20,8 +20,8 @@ source tcl/ips_src_files.tcl
 source tcl/src_files.tcl
 
 # add memory cuts
-add_files -norecurse $FPGA_IPS/xilinx_mem_8192x32/ip/xilinx_mem_8192x32.dcp
-add_files -norecurse $FPGA_IPS/xilinx_fp_fma/ip/xilinx_fp_fma.dcp
+read_ip $FPGA_IPS/xilinx_mem_8192x32/xilinx_mem_8192x32.srcs/sources_1/ip/xilinx_mem_8192x32/xilinx_mem_8192x32.xci
+read_ip $FPGA_IPS/xilinx_fp_fma/xilinx_fp_fma.srcs/sources_1/ip/xilinx_fp_fma/xilinx_fp_fma.xci
 
 source ./tcl/ips_add_files.tcl
 if {$::env(USE_ZERO_RISCY)==0} {
