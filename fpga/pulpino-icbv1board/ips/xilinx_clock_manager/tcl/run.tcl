@@ -10,7 +10,7 @@ set partNumber $::env(XILINX_PART)
 
 set ila_name xilinx_clock_manager
 
-create_project $ila_name . -part $partNumber
+create_project -force $ila_name . -part $partNumber
 
 
 create_ip -name clk_wiz -vendor xilinx.com -library ip -module_name $ila_name
